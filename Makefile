@@ -23,4 +23,4 @@ install: all
 	install -m 644 README.md $(PREFIX)/doc
 
 clean:
-	rm src/*.o *.a
+	rm -f src/*.o *.a
