@@ -11,6 +11,7 @@ Edit Makefile for your environment.  (TODO: set this up with configure and pkg-c
 
     $ make
     $ make PREFIX=/path/for/installation install
+    $ make PREFIX=/path/for/installation test
 
 ## API
 
@@ -22,7 +23,7 @@ better off looking at the header files.
 First thing to do is create an empty tree.  The "compare" function acts like
 strcmp, returning negative if a is less than b, 0 if equal, positive if a > b.
 The print function turns your "key" into something human-readable.  Primarily
-used for rb_print_tree but also useful for debugging.
+used for rb\_print\_tree but also useful for debugging.
 
     rb_tree * rb_new_tree(int (*compare)(rb_node *a, rb_node *b), void (*print)(rb_node *a));
 
