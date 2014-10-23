@@ -419,3 +419,6 @@ void rb_print_tree(rb_tree *t, int format_flags)
 	print_tree(t);
 }
 
+
+/* would rb_enumerate be useful?: output all the keys k such that a <= k <= b in
+ * a red-black tree rooted a x */
