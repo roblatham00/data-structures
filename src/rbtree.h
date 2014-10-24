@@ -18,6 +18,7 @@ enum rb_tree_output_flags {
 typedef struct rb_node {
     int color;
     RBTREE_TYPE *key;
+    void *value;
     struct rb_node *left;
     struct rb_node *right;
     struct rb_node *p;
