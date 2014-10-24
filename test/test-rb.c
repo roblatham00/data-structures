@@ -4,12 +4,10 @@
 
 #include "rbtree.h"
 
-int int_compare(rb_node *a, rb_node *b)
+int int_compare(void *a, void *b)
 {
-    int x, y;
-
-    x = *((int*)a->key);
-    y = *((int*)b->key);
+    int x = *((int *)a);
+    int y = *((int *)b);
 
     if (x<y) return -1;
     if (x==y) return 0;
@@ -17,13 +15,13 @@ int int_compare(rb_node *a, rb_node *b)
     return 1;
 }
 
-int string_compare(rb_node *a, rb_node *b)
+int string_compare(void *a, void *b)
 {
-    return strcmp(a->key, b->key);
+    return strcmp(a, b);
 }
 
-void int_print(rb_node *a) {
-    printf("%d", *(int*)a->key);
+void int_print(void *a) {
+    printf("%d", *((int*)a));
 }
 
 int main(int argc, char **argv)

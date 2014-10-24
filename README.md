@@ -25,7 +25,7 @@ strcmp, returning negative if a is less than b, 0 if equal, positive if a > b.
 The print function turns your "key" into something human-readable.  Primarily
 used for rb\_print\_tree but also useful for debugging.
 
-    rb_tree * rb_new_tree(int (*compare)(rb_node *a, rb_node *b), void (*print)(rb_node *a));
+    rb_tree * rb_new_tree(int (*compare)(void *a, void *b), void (*print)(void *a));
 
 A new node in the tree has some blob of memory 'key'.  Your compare function will know how to cast/compare this blob
 
@@ -48,6 +48,12 @@ Here are the flags:
  * RB\_TREE\_DOT: will produce [graphviz](www.graphviz.org) output
  * RB\_TREE\_DEFAULT: will produce plain text
 
+#### Debugging
+
+void * everywhere makes the limited C type checking even less useful.  For a
+bit of help, one can define RBTREE\_TYPE before including rbtree.h.  The type
+signature for the compare and print functions then take RBTREE\_TYPE * instead
+of void * .
 
 ## Author
 

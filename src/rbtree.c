@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#define RBTREE_TYPE int
 #include "rbtree.h"
 
 rb_node nil = {
@@ -189,7 +190,7 @@ static void print_helper_dot(rb_tree *T, rb_node *x)
     }
     printf("   %lld [label=", (long long)x);
 
-    T->print(x);
+    T->print(x->key);
 
     if (x->color == RED)
 	printf( " color=\"red\"];\n");
@@ -211,7 +212,7 @@ void print_helper(rb_tree *T, rb_node *x, int depth)
 
     for (i=0; i<depth; i++)
 	printf("-");
-    T->print(x);
+    T->print(x->key);
     printf("\n");
     if (x->right != T->nil) {
 	print_helper(T, x->right, depth+1);
@@ -241,7 +242,7 @@ void rb_insert(rb_tree *T, rb_node *z)
 
     while (x != T->nil) {
 	y = x;
-	if (T->compare(z, x) < 0) {
+	if (T->compare(z->key, x->key) < 0) {
 	    x = x->left;
 	} else {
 	    x = x->right;
@@ -251,7 +252,7 @@ void rb_insert(rb_tree *T, rb_node *z)
 
     if (y == T->nil) {
 	T->root = z;
-    } else if ( T->compare(z, y) < 0) {
+    } else if ( T->compare(z->key, y->key) < 0) {
 	y->left = z;
     } else {
 	y->right = z;
@@ -378,7 +379,7 @@ rb_node *rb_delete(rb_tree *T, rb_node *z)
 }
 
 
-rb_node * rb_new_node(void *key)
+rb_node * rb_new_node(RBTREE_TYPE *key)
 {
     rb_node *n;
     n = malloc(sizeof(*n));
@@ -391,8 +392,8 @@ rb_node * rb_new_node(void *key)
     return n;
 }
 
-rb_tree * rb_new_tree(int (*compare)(rb_node *a, rb_node *b),
-	void (*print)(rb_node *a))
+rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
+	void (*print)(RBTREE_TYPE *a))
 {
     rb_tree * T = malloc (sizeof(rb_tree));
 
