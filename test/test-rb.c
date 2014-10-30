@@ -18,11 +18,6 @@ int int_compare(RBTREE_TYPE *a, RBTREE_TYPE *b)
     return 1;
 }
 
-int string_compare(void *a, void *b)
-{
-    return strcmp(a, b);
-}
-
 void int_print(rb_node *a) {
     printf("%d", *(int *)(a->key) );
 }
