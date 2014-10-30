@@ -35,5 +35,6 @@ rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
 	void (*print)(RBTREE_TYPE *key, void *value));
 rb_node * rb_new_node(RBTREE_TYPE *key);
 void rb_insert(rb_tree *t, rb_node *z);
+rb_node *rb_search(rb_tree *t, RBTREE_TYPE *k);
 rb_node *rb_delete(rb_tree *T, rb_node *z);
 void rb_print_tree(rb_tree *t, int format_flags);

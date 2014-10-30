@@ -264,6 +264,18 @@ void rb_insert(rb_tree *T, rb_node *z)
     rb_insert_fixup(T, z);
 }
 
+rb_node *rb_search(rb_tree *T, RBTREE_TYPE *k)
+{
+    rb_node *x = T->root;
+    while(x != T->nil && T->compare(k, x->key) ) {
+	if (T->compare(k, x->key) < 0)
+	    x = x->left;
+	else
+	    x = x->right;
+    }
+    return x;
+}
+
 /* delete_fixup called if removed node 'y' was black.  removing black node
  * might cause three problems:
  * 1: y was the root; a red child might then become new root
