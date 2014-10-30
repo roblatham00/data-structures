@@ -190,7 +190,7 @@ static void print_helper_dot(rb_tree *T, rb_node *x)
     }
     printf("   %lld [label=", (long long)x);
 
-    T->print(x->key);
+    T->print(x->key, x->value);
 
     if (x->color == RED)
 	printf( " color=\"red\"];\n");
@@ -212,7 +212,7 @@ void print_helper(rb_tree *T, rb_node *x, int depth)
 
     for (i=0; i<depth; i++)
 	printf("-");
-    T->print(x->key);
+    T->print(x->key, x->value);
     printf("\n");
     if (x->right != T->nil) {
 	print_helper(T, x->right, depth+1);
@@ -393,7 +393,7 @@ rb_node * rb_new_node(RBTREE_TYPE *key)
 }
 
 rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
-	void (*print)(RBTREE_TYPE *a))
+	void (*print)(RBTREE_TYPE *key, void * value))
 {
     rb_tree * T = malloc (sizeof(rb_tree));
 

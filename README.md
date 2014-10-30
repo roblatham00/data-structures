@@ -22,10 +22,11 @@ better off looking at the header files.
 
 First thing to do is create an empty tree.  The "compare" function acts like
 strcmp, returning negative if a is less than b, 0 if equal, positive if a > b.
-The print function turns your "key" into something human-readable.  Primarily
+The print function turns your key and value into something human-readable.  Primarily
 used for rb\_print\_tree but also useful for debugging.
 
-    rb_tree * rb_new_tree(int (*compare)(void *a, void *b), void (*print)(void *a));
+    rb_tree * rb_new_tree(int (*compare)(void *a, void *b),
+    	void (*print)(void *key, void *value));
 
 A new node in the tree has some blob of memory 'key'.  Your compare function will know how to cast/compare this blob
 
