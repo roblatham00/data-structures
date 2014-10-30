@@ -362,6 +362,9 @@ void rb_delete_fixup(rb_tree *T, rb_node *x)
 rb_node *rb_delete(rb_tree *T, rb_node *z)
 {
     rb_node *y, *x;
+    /* hardening case: what if z is bogus ? */
+    if (z == NULL || z->left == NULL || z->right == NULL || z->p == NULL)
+	return z;
 
     if ( (z->left == T->nil) || (z->right == T->nil) )
 	y = z;
