@@ -1,0 +1,6 @@
+cscope.out
+cscope.files
+*.gcda
+*.gcno
+coverage.info
+coverage/
