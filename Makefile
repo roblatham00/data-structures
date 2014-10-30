@@ -5,14 +5,18 @@ TEST_CFLAGS=$(CFLAGS) -I$(PREFIX)/include
 TEST_LDFLAGS=-L$(PREFIX)/lib
 TEST_LDLIBS=-lrbtree
 
+rbtree.o: rbtree.c rbtree.h
+
 librbtree.a: librbtree.a(src/rbtree.o)
-all: librbtree.a src/rbtree.o src/rbtree.h
+
+
+all: librbtree.a
 
 test/test-rb.o: test/test-rb.c
 	$(CC) $(TEST_CFLAGS) $< -c -o $@
 
-test-rb: test/test-rb.o
-	$(CC) $< -o $@ $(TEST_LDFLAGS) $(TEST_LDLIBS)
+test-rb: test/test-rb.o librbtree.a
+	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) $(TEST_LDLIBS)
 
 test: test-rb
 
