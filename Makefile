@@ -26,5 +26,10 @@ install: all
 	install -m 644 src/rbtree.h $(PREFIX)/include
 	install -m 644 README.md $(PREFIX)/doc
 
+# coverage requires lcov
+coverage-report:
+	lcov --directory . --capture --output-file coverage.info
+	genhtml --legend --output-directory coverage coverage.info
+
 clean:
-	rm -f src/*.o *.a
+	rm -f src/*.o *.a test/*.o
