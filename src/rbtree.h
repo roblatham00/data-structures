@@ -28,14 +28,14 @@ typedef struct {
     rb_node *root;
     rb_node *nil; /* sentinal as used in CLRS */
     int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b);
-    void (*print)(RBTREE_TYPE *key, void *value);
+    void (*print)(rb_node *a);
     /* useful for augmented data structures such as interval tree */
     void (*copy) (RBTREE_TYPE *dest, RBTREE_TYPE *src);
 }rb_tree;
 
 /* maybe the compare function should take an argument, like qsort_r ? */
 rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
-	void (*print)(RBTREE_TYPE *key, void *value));
+	void (*print)(rb_node *a));
 rb_node * rb_new_node(RBTREE_TYPE *key);
 void rb_insert(rb_tree *t, rb_node *z);
 rb_node *rb_search(rb_tree *t, RBTREE_TYPE *k);

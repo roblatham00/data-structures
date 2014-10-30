@@ -23,8 +23,8 @@ int string_compare(void *a, void *b)
     return strcmp(a, b);
 }
 
-void int_print(RBTREE_TYPE *a, void *value) {
-    printf("%d", *(int *)a);
+void int_print(rb_node *a) {
+    printf("%d", *(int *)(a->key) );
 }
 rb_node *mknode(int i)
 {
