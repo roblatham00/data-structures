@@ -194,14 +194,14 @@ static void print_helper_dot(rb_tree *T, rb_node *x)
 	printf("   %lld->%lld;\n", (long long)x, (long long)x->left);
 	print_helper_dot(T, x->left);
     }
-    printf("   %lld [label=", (long long)x);
+    printf("   %lld [label=\"", (long long)x);
 
     T->print(x);
 
     if (x->color == RED)
-	printf( " color=\"red\"];\n");
+	printf( "\" color=\"red\"];\n");
     else
-	printf( " color=\"black\"];\n");
+	printf( "\" color=\"black\"];\n");
 
     if (x->right != T->nil) {
 	printf("   %lld->%lld;\n", (long long)x, (long long)x->right);
