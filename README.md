@@ -56,6 +56,11 @@ bit of help, one can define RBTREE\_TYPE before including rbtree.h.  The type
 signature for the compare and print functions then take RBTREE\_TYPE * instead
 of void * .
 
+### interval tree
+
+It's a trick! the red-black tree is already an interval tree, where every node
+has a one-element interval (e.g. [2-2]).
+
 ### ordered statistics tree
 
 Same trick.  We maintain enough additional information in the standard red
