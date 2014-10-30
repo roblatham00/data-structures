@@ -46,6 +46,9 @@ static void left_rotate(rb_tree *T, rb_node *x)
     /* put x on y's left */
     y->left = x;
     x->p = y;
+    /* augment: order-statistics tree */
+    y->size = x->size;
+    x->size = x->left->size + x->right->size + 1;
 }
 
 static void right_rotate(rb_tree *T, rb_node *y)
@@ -77,6 +80,9 @@ static void right_rotate(rb_tree *T, rb_node *y)
     /* put y on x's right */
     x->right = y;
     y->p = x;
+    /* augment: order-statistics tree */
+    x->size = y->size;
+    y->size = y->left->size + y->right->size + 1;
 
 }
 
@@ -240,7 +246,9 @@ void rb_insert(rb_tree *T, rb_node *z)
     rb_node *y = T->nil;
     rb_node *x = T->root;
 
+    z->size = 1; /* augment: ordered-statistics tree */
     while (x != T->nil) {
+	x->size += 1; /* augment: ordered-statisics tree */
 	y = x;
 	if (T->compare(z->key, x->key) < 0) {
 	    x = x->left;

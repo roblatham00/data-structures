@@ -19,6 +19,12 @@ typedef struct rb_node {
     int color;
     RBTREE_TYPE *key;
     void *value;
+    /* additional fields for augmented data strucutres */
+    /* ordered-statistics: */
+    int size;
+    /* interval tree */
+    RBTREE_TYPE *low;
+    RBTREE_TYPE *high;
     struct rb_node *left;
     struct rb_node *right;
     struct rb_node *p;

@@ -56,6 +56,11 @@ bit of help, one can define RBTREE\_TYPE before including rbtree.h.  The type
 signature for the compare and print functions then take RBTREE\_TYPE * instead
 of void * .
 
+### ordered statistics tree
+
+Same trick.  We maintain enough additional information in the standard red
+black tree to also offer ordered-statistics methods
+
 ## Author
 
 Rob Latham (robl@mcs.anl.gov)
