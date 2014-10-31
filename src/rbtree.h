@@ -1,3 +1,6 @@
+#ifndef _RBTREE_H
+#define _RBTREE_H
+
 /* for a bit of type safety you can define RBTREE_TYPE before including
  * rbtree.h .  If you do not, the usual C style "void *" will be used
  * everywhere */
@@ -19,15 +22,16 @@ typedef struct rb_node {
     int color;
     RBTREE_TYPE *key;
     void *value;
-    /* additional fields for augmented data strucutres */
+    struct rb_node *left;
+    struct rb_node *right;
+    struct rb_node *p;
+   /* additional fields for augmented data strucutres */
     /* ordered-statistics: */
     int size;
     /* interval tree */
     RBTREE_TYPE *low;
     RBTREE_TYPE *high;
-    struct rb_node *left;
-    struct rb_node *right;
-    struct rb_node *p;
+    RBTREE_TYPE *max;
 } rb_node;
 
 typedef struct {
@@ -47,3 +51,5 @@ void rb_insert(rb_tree *t, rb_node *z);
 rb_node *rb_search(rb_tree *t, RBTREE_TYPE *k);
 rb_node *rb_delete(rb_tree *T, rb_node *z);
 void rb_print_tree(rb_tree *t, int format_flags);
+
+#endif

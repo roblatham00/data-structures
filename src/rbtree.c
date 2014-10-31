@@ -10,8 +10,24 @@ rb_node nil = {
     .left = NULL,
     .right = NULL,
     .p = NULL,
+    .size = 0,
+    .low = NULL,
+    .high = NULL,
+    .max = NULL,
+
 };
 
+/* returns pointer to largest of three things */
+void * max3(rb_tree *T, void *a, void *b, void *c)
+{
+    void * max = a;
+    if ((b != NULL) && T->compare(b, max) > 0)
+	max = b;
+    if (T->compare(c, max) > 0)
+	max = c;
+
+    return max;
+}
 /* internal routines for tree maintenance */
 
 static void left_rotate(rb_tree *T, rb_node *x)
@@ -49,6 +65,12 @@ static void left_rotate(rb_tree *T, rb_node *x)
     /* augment: order-statistics tree */
     y->size = x->size;
     x->size = x->left->size + x->right->size + 1;
+
+    /* augment: interval tree */
+    y->max = x->max;
+    x->max = max3(T, x->high,
+	    (x->left  == T->nil ? x->high : x->left->max),
+	    (x->right == T->nil ? x->high : x->right->max) );
 }
 
 static void right_rotate(rb_tree *T, rb_node *y)
@@ -84,6 +106,11 @@ static void right_rotate(rb_tree *T, rb_node *y)
     x->size = y->size;
     y->size = y->left->size + y->right->size + 1;
 
+    /* augment: interval tree */
+    x->max = y->max;
+    y->max = max3(T, y->high,
+	    (y->left  == T->nil ? y->high : y->left->max),
+	    (y->right == T->nil ? y->high : y->right->max) );
 }
 
 /* restating what is in CLRS, a red-black tree has 5 properties:
@@ -411,6 +438,12 @@ rb_node * rb_new_node(RBTREE_TYPE *key)
     n->p = NULL;
     n->left = NULL;
     n->right = NULL;
+    /* ordered-statistics augment */
+    n->size = 0; /* will increment by one once inserted */
+    /* interval list augment */
+    n->low = key;
+    n->high = key;
+    n->max = key;
 
     return n;
 }
