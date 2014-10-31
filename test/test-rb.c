@@ -38,7 +38,7 @@ void tree_test_random(int nr_nodes)
     for (i=0; i< nr_nodes ; i++) {
 	rb_insert(tree, mknode(random()) );
     }
-    rb_print_tree(tree, RB_TREE_DOT);
+    //rb_print_tree(tree, RB_TREE_DOT);
     return;
 }
 
@@ -76,7 +76,7 @@ void tree_test_delete_random(int nr_nodes)
 	    free(d);
 	}
     }
-    rb_print_tree(tree, RB_TREE_DOT);
+    //rb_print_tree(tree, RB_TREE_DOT);
 
 }
 
@@ -105,6 +105,24 @@ void tree_test_delete()
     }
 
 }
+
+void tree_test_delete_with_sucessor()
+{
+    int i, key, nodes[] = {15, 9, 5, 16, 29, 3, 12, 20, 33, 21, 25,
+	10, 8, 11, 13, 14, 2, 35, 18, 23, 6, 7, 0};
+
+    rb_tree *tree = rb_new_tree(int_compare, int_print);
+    rb_node *d;
+    for (i=0; nodes[i] != 0; i++) {
+	rb_insert(tree, mknode(nodes[i]) );
+    }
+    key = 21;
+    d = rb_search(tree, &key);
+    rb_delete(tree, d);
+
+    rb_print_tree(tree, RB_TREE_DOT);
+}
+
 int main(int argc, char **argv)
 {
     tree_test_random(atoi(argv[1]));
@@ -112,6 +130,8 @@ int main(int argc, char **argv)
     tree_test_delete();
 
     tree_test_delete_random(atoi(argv[1]));
+
+    tree_test_delete_with_sucessor();
 
     return 0;
 }
