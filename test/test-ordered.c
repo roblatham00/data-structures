@@ -35,7 +35,7 @@ void test_tree()
 {
     rb_tree *tree = rb_new_tree(int_compare, ordered_print);
     rb_node *x;
-    int i, key;
+    int i;
     /* copy tree from 14.1 in CLRS */
     int nodes[] = {26, 17, 41, 14, 21, 30, 47, 10, 16, 19, 21, 28, 38, 7, 12,
 	14, 20, 35, 39, 3, 0};
@@ -44,8 +44,8 @@ void test_tree()
 	rb_insert(tree, mknode(nodes[i]));
     rb_print_tree(tree, RB_TREE_DOT);
 
-    key = 38;
-    x = rb_search(tree, &key);
+    x = ordered_select(tree, 17);
+
     assert (ordered_rank(tree, x) == 17);
 
 }
