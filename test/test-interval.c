@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+
 #define INTERVAL_TYPE int
 
 #include "interval_tree.h"
@@ -16,7 +18,7 @@ void int_print(rb_node *n) {
 	    *((int *)n->low), *((int *)n->high), *((int *)n->max));
 }
 
-void test_tree1(int nodes)
+void test_tree1()
 {
     int j;
     /* figure 14.4 CLRS "Introduction to algorithims" */
@@ -25,7 +27,7 @@ void test_tree1(int nodes)
 
     interval_tree *tree = rb_new_tree(int_compare, int_print);
 
-    for (j=0; (intervals[j][0]+intervals[j][1] != 0) && (j<nodes); j++) {
+    for (j=0; (intervals[j][0]+intervals[j][1] != 0); j++) {
 	interval *i = malloc(sizeof(*i));
 	i->low = &(intervals[j][0]);
 	i->high = &(intervals[j][1]);
@@ -33,12 +35,34 @@ void test_tree1(int nodes)
 	interval_node *n = interval_new_node(i);
 	rb_insert(tree, n);
     }
+
+    /* unsuccessful search */
+    int low=11, high=14;
+    interval i = {
+	.low = &low,
+	.high = &high,
+    };
+
+    interval_node *node = interval_search(tree, &i);
+    assert(node == tree->nil);
+
+    /* successful search */
+    low=22;
+    high=25;
+    node = interval_search(tree, &i);
+    assert( *(int*)node->low == 15);
+    assert( *(int*)node->high == 23);
+
+
+    /* deletion */
+    node = interval_delete(tree, node);
+
     rb_print_tree(tree, RB_TREE_DOT);
 }
 
 int main(int argc, char **argv)
 {
-    test_tree1(atoi(argv[1]));
+    test_tree1();
     return 0;
 }
 
