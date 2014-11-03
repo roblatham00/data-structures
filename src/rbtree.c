@@ -396,6 +396,17 @@ void rb_delete_fixup(rb_tree *T, rb_node *x)
     x->color = BLACK;
 }
 
+
+/* two adjustments:
+ * - decrease the 'size' along the path to the parent
+ * - adjust the 'max' along the path to the parent */
+void augment_fixup(rb_tree *T, rb_node *x)
+{
+    if (x == T->nil) return;
+    x->size -= 1;
+    x->max = max3(T, x->high, x->left->max, x->right->max);
+    augment_fixup(T, x->p);
+}
 /* returns the node to be reclaimed */
 rb_node *rb_delete(rb_tree *T, rb_node *z)
 {
@@ -408,6 +419,12 @@ rb_node *rb_delete(rb_tree *T, rb_node *z)
 	y = z;
     else
 	y = tree_successor(T, z);
+
+    /* augment, part 1: adjust metadata of removed node */
+    y->size -= 1;
+    y->max = NULL;
+     /* augment, part 2: fix path up to parent */
+    augment_fixup(T, y->p);
 
     if (y->left != T->nil)
 	x= y->left;
