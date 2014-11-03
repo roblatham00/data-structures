@@ -57,7 +57,14 @@ void test_tree1()
     /* deletion */
     node = interval_delete(tree, node);
 
+    low=25;
+    high=30;
+    node = interval_search(tree, &i);
+    node = interval_delete(tree, node);
+    assert(*(int *)tree->root->max == 26);
+
     rb_print_tree(tree, RB_TREE_DOT);
+
 }
 
 int main(int argc, char **argv)
