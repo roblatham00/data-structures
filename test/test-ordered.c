@@ -48,6 +48,10 @@ void test_tree()
 
     assert (ordered_rank(tree, x) == 17);
 
+    /* peek inside the data structure to ensure it all updated */
+    x = ordered_select(tree, 1);
+    x = rb_delete(tree, x);
+    assert(tree->root->size == 19);
 }
 
 int main(int argc, char **argv)
