@@ -53,4 +53,4 @@ coverage-report:
 	genhtml --legend --output-directory coverage coverage.info
 
 clean:
-	rm -f src/*.o *.a test/*.o test-os test-rb
+	rm -f src/*.o *.a test/*.o test-os test-rb test-interval
