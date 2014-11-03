@@ -20,10 +20,10 @@ rb_node nil = {
 /* returns pointer to largest of three things */
 void * max3(rb_tree *T, void *a, void *b, void *c)
 {
-    void * max = a;
-    if ((b != NULL) && T->compare(b, max) > 0)
+    void *max = a;
+    if ((max != NULL) && (b!= NULL) && T->compare(b, max) > 0)
 	max = b;
-    if (T->compare(c, max) > 0)
+    if ((max != NULL) && (c!= NULL) && T->compare(c, max) > 0)
 	max = c;
 
     return max;
@@ -68,9 +68,7 @@ static void left_rotate(rb_tree *T, rb_node *x)
 
     /* augment: interval tree */
     y->max = x->max;
-    x->max = max3(T, x->high,
-	    (x->left  == T->nil ? x->high : x->left->max),
-	    (x->right == T->nil ? x->high : x->right->max) );
+    x->max = max3(T, x->high, x->left->max, x->right->max);
 }
 
 static void right_rotate(rb_tree *T, rb_node *y)
@@ -108,9 +106,7 @@ static void right_rotate(rb_tree *T, rb_node *y)
 
     /* augment: interval tree */
     x->max = y->max;
-    y->max = max3(T, y->high,
-	    (y->left  == T->nil ? y->high : y->left->max),
-	    (y->right == T->nil ? y->high : y->right->max) );
+    y->max = max3(T, y->high, y->left->max, y->right->max);
 }
 
 /* restating what is in CLRS, a red-black tree has 5 properties:
