@@ -473,6 +473,7 @@ rb_node * rb_new_node(RBTREE_TYPE *key)
     n = malloc(sizeof(*n));
     n->color = RED;
     n->key = key;
+    n->value = NULL;
     n->p = NULL;
     n->left = NULL;
     n->right = NULL;
@@ -487,7 +488,9 @@ rb_node * rb_new_node(RBTREE_TYPE *key)
 }
 
 rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
-	void (*print)(rb_node *a))
+	void (*copy)(rb_node *a),
+	void (*free)(rb_node *a),
+	void (*print)(rb_node *a) )
 {
     rb_tree * T = malloc (sizeof(rb_tree));
 
@@ -502,8 +505,33 @@ rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
 
     T->compare = compare;
     T->print = print;
+    T->free = free;
+    T->copy = NULL;
 
     return T;
+}
+
+void rb_node_free(rb_tree *t, rb_node *x)
+{
+    if (t->free != NULL)
+	t->free (x);
+    free(x);
+}
+
+void rb_tree_destroy_do(rb_tree *t, rb_node *x)
+{
+    if (x->left != t->nil)
+	rb_tree_destroy_do(t, x->left);
+    if (x->right != t->nil)
+	rb_tree_destroy_do(t, x->right);
+    if (x != t->nil)
+	rb_node_free(t, x);
+}
+void rb_delete_tree(rb_tree *t)
+{
+    rb_tree_destroy_do(t, t->root);
+    free(t->nil);
+    free(t);
 }
 
 void rb_print_tree(rb_tree *t, int format_flags)

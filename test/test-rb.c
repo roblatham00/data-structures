@@ -21,6 +21,12 @@ int int_compare(RBTREE_TYPE *a, RBTREE_TYPE *b)
 void int_print(rb_node *a) {
     printf("%d", *(int *)(a->key) );
 }
+
+void int_free(rb_node *a)
+{
+    free(a->key);
+}
+
 rb_node *mknode(int i)
 {
     int *key = malloc(sizeof(*key));
@@ -33,12 +39,13 @@ rb_node *mknode(int i)
 void tree_test_random(int nr_nodes)
 {
     int i;
-    rb_tree * tree = rb_new_tree(int_compare, int_print);
+    rb_tree * tree = rb_new_tree(int_compare, NULL, int_free, int_print);
 
     for (i=0; i< nr_nodes ; i++) {
 	rb_insert(tree, mknode(random()) );
     }
     //rb_print_tree(tree, RB_TREE_DOT);
+    rb_delete_tree(tree);
     return;
 }
 
@@ -60,7 +67,7 @@ void tree_test_delete_random(int nr_nodes)
     int i;
     int *targets = malloc(sizeof(*targets)*nr_nodes);
     rb_node *d;
-    rb_tree *tree = rb_new_tree(int_compare, int_print);
+    rb_tree * tree = rb_new_tree(int_compare, NULL, int_free, int_print);
 
     for (i=0; i< nr_nodes ; i++) {
 	targets[i] = random();
@@ -73,16 +80,18 @@ void tree_test_delete_random(int nr_nodes)
 	d = rb_search(tree, &(targets[i]));
 	if (d != tree->nil) {
 	    d = rb_delete(tree, d);
-	    free(d);
+	    rb_node_free(tree, d);
 	}
     }
+    rb_delete_tree(tree);
+    free(targets);
     //rb_print_tree(tree, RB_TREE_DOT);
 
 }
 
 void tree_test_delete()
 {
-    rb_tree *tree = rb_new_tree(int_compare, int_print);
+    rb_tree * tree = rb_new_tree(int_compare, NULL, int_free, int_print);
     rb_insert(tree, mknode(3));
     rb_insert(tree, mknode(1));
     rb_insert(tree, mknode(5));
@@ -94,16 +103,17 @@ void tree_test_delete()
     rb_node *d;
 
     d = rb_delete(tree, mknode(3));
-    free(d);
+    rb_node_free(tree, d);
 
     /* we now have a 5-node tree with red leaves 2 and 7 */
     int key = 1;
     d = rb_search(tree, &key);
     if (d != tree->nil) {
-	rb_delete(tree, d);
-	free(d);
+	d = rb_delete(tree, d);
+	rb_node_free(tree,d);
     }
 
+    rb_delete_tree(tree);
 }
 
 void tree_test_delete_with_sucessor()
@@ -111,16 +121,18 @@ void tree_test_delete_with_sucessor()
     int i, key, nodes[] = {15, 9, 5, 16, 29, 3, 12, 20, 33, 21, 25,
 	10, 8, 11, 13, 14, 2, 35, 18, 23, 6, 7, 0};
 
-    rb_tree *tree = rb_new_tree(int_compare, int_print);
+    rb_tree * tree = rb_new_tree(int_compare, NULL, int_free, int_print);
     rb_node *d;
     for (i=0; nodes[i] != 0; i++) {
 	rb_insert(tree, mknode(nodes[i]) );
     }
     key = 21;
     d = rb_search(tree, &key);
-    rb_delete(tree, d);
+    d = rb_delete(tree, d);
+    rb_node_free(tree, d);
 
     rb_print_tree(tree, RB_TREE_DOT);
+    rb_delete_tree(tree);
 }
 
 int main(int argc, char **argv)
