@@ -416,21 +416,20 @@ rb_node *rb_delete(rb_tree *T, rb_node *z)
 	return z;
 
     if ( (z->left == T->nil) || (z->right == T->nil) )
+	/* z has at most one child: can kick it out of tree */
 	y = z;
     else
+	/* with two children, it is z's sucessor we kick out */
 	y = tree_successor(T, z);
 
-    /* augment, part 1: adjust metadata of removed node */
-    y->size -= 1;
-    y->max = NULL;
-     /* augment, part 2: fix path up to parent */
-    augment_fixup(T, y->p);
 
+    /* set x to non-nil child, or nil if no children */
     if (y->left != T->nil)
 	x= y->left;
     else
 	x = y->right;
 
+    /* re-wire y's parent and x, removing y from the tree */
     x->p = y->p;
     if (y->p == T->nil)
 	T->root = x;
@@ -439,9 +438,28 @@ rb_node *rb_delete(rb_tree *T, rb_node *z)
     else
 	y->p->right = x;
 
-    if (y!=z)
+    /* above algorithim may choose sucessor of z to splice out.  in such a
+     * case, copy y's key and additional data into z before returning y */
+    if (y!=z) {
+	/* needs to copy all the node information */
 	z->key = y->key;
+	z->value = y->value;
+	/* augmented members: here is where I need a copy function */
+	z->low = y->low;
+	z->high = y->high;
+	z->max = y->max;
+	z->size = y->size;
+    }
 
+    /* augment, part 1: adjust metadata of removed node */
+    y->size -= 1;
+    y->max = NULL;
+     /* augment, part 2: fix path up to parent */
+    augment_fixup(T, y->p);
+
+    /* removing a black node can distrub one or all of black-heights, adjacent
+     * red-ness, and color of root.  fix up y's child x (x will be nil if y had
+     * no children */
     if (y->color == BLACK)
 	rb_delete_fixup(T, x);
 
