@@ -292,6 +292,13 @@ void rb_insert(rb_tree *T, rb_node *z)
     z->left = T->nil;
     z->right = T->nil;
     z->color = RED;
+    /* augment for interval tree:
+     * if z is the root, it has no parent.  If it has a parent, we need to
+     * update that parent's max .  insert_fixup might not update it if there's
+     * no need for a rotation */
+    if (z != T->root)
+	z->p->max = max3(T, z->p->high, z->p->left->max, z->p->right->max);
+
     rb_insert_fixup(T, z);
 }
 
