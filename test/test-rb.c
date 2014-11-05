@@ -79,8 +79,7 @@ void tree_test_delete_random(int nr_nodes)
     for (i=0; i< nr_nodes ;i++ ) {
 	d = rb_search(tree, &(targets[i]));
 	if (d != tree->nil) {
-	    d = rb_delete(tree, d);
-	    rb_node_free(tree, d);
+	    rb_delete(tree, d);
 	}
     }
     rb_delete_tree(tree);
@@ -102,15 +101,13 @@ void tree_test_delete()
     /* try to delete a node that does not live on the tree */
     rb_node *d;
 
-    d = rb_delete(tree, mknode(3));
-    rb_node_free(tree, d);
+    rb_delete(tree, mknode(3));
 
     /* we now have a 5-node tree with red leaves 2 and 7 */
     int key = 1;
     d = rb_search(tree, &key);
     if (d != tree->nil) {
-	d = rb_delete(tree, d);
-	rb_node_free(tree,d);
+	rb_delete(tree, d);
     }
 
     rb_delete_tree(tree);
@@ -128,8 +125,7 @@ void tree_test_delete_with_sucessor()
     }
     key = 21;
     d = rb_search(tree, &key);
-    d = rb_delete(tree, d);
-    rb_node_free(tree, d);
+    rb_delete(tree, d);
 
     rb_print_tree(tree, RB_TREE_DOT);
     rb_delete_tree(tree);

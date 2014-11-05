@@ -17,6 +17,11 @@ int int_compare(RBTREE_TYPE *a, RBTREE_TYPE *b)
     return x-y;
 }
 
+void int_free(rb_node *a)
+{
+    free(a->key);
+}
+
 void ordered_print(rb_node *a) {
     printf("%d / %d",
 	    *(int *)(a->key),
@@ -33,7 +38,7 @@ rb_node *mknode(int i)
 
 void test_tree()
 {
-    rb_tree *tree = rb_new_tree(int_compare, ordered_print);
+    rb_tree *tree = rb_new_tree(int_compare, NULL, int_free, ordered_print);
     rb_node *x;
     int i;
     /* copy tree from 14.1 in CLRS */
@@ -50,8 +55,10 @@ void test_tree()
 
     /* peek inside the data structure to ensure it all updated */
     x = ordered_select(tree, 1);
-    x = rb_delete(tree, x);
+    rb_delete(tree, x);
     assert(tree->root->size == 19);
+
+    rb_delete_tree(tree);
 }
 
 int main(int argc, char **argv)

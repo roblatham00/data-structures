@@ -49,8 +49,8 @@ interval_node * interval_search(interval_tree *T, interval *i)
     return x;
 }
 
-interval_node * interval_delete(interval_tree *T, interval_node *x)
+void interval_delete(interval_tree *T, interval_node *x)
 {
-    return (rb_delete(T, x));
+    rb_delete(T, x);
 }
 

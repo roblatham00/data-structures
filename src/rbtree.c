@@ -396,6 +396,12 @@ void rb_delete_fixup(rb_tree *T, rb_node *x)
     x->color = BLACK;
 }
 
+static void rb_node_free(rb_tree *t, rb_node *x)
+{
+    if (t->free != NULL)
+	t->free (x);
+    free(x);
+}
 
 /* two adjustments:
  * - decrease the 'size' along the path to the parent
@@ -408,12 +414,18 @@ void augment_fixup(rb_tree *T, rb_node *x)
     augment_fixup(T, x->p);
 }
 /* returns the node to be reclaimed */
-rb_node *rb_delete(rb_tree *T, rb_node *z)
+/* it is easier (in the 'y!=z' case, especially) if I just delete the node
+ * directly   */
+void rb_delete(rb_tree *T, rb_node *z)
 {
     rb_node *y, *x;
     /* hardening case: what if z is bogus ? */
-    if (z == NULL || z->left == NULL || z->right == NULL || z->p == NULL)
-	return z;
+    if (z == NULL)
+	return;
+    if (z->left == NULL || z->right == NULL || z->p == NULL) {
+	rb_node_free(T, z);
+	return;
+    }
 
     if ( (z->left == T->nil) || (z->right == T->nil) )
 	/* z has at most one child: can kick it out of tree */
@@ -463,7 +475,7 @@ rb_node *rb_delete(rb_tree *T, rb_node *z)
     if (y->color == BLACK)
 	rb_delete_fixup(T, x);
 
-    return y;
+    rb_node_free(T, y);
 }
 
 
@@ -509,13 +521,6 @@ rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
     T->copy = NULL;
 
     return T;
-}
-
-void rb_node_free(rb_tree *t, rb_node *x)
-{
-    if (t->free != NULL)
-	t->free (x);
-    free(x);
 }
 
 void rb_tree_destroy_do(rb_tree *t, rb_node *x)
