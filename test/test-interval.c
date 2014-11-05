@@ -18,6 +18,10 @@ void int_print(rb_node *n) {
 	    *((int *)n->low), *((int *)n->high), *((int *)n->max));
 }
 
+void int_free(rb_node *a) {
+    free(a->key);
+}
+
 void test_tree1()
 {
     int j;
@@ -25,42 +29,39 @@ void test_tree1()
     int intervals[][2] = {{ 16,21}, {8,9}, {25,30}, {5,8}, {15,23},
 	{17,19}, {26,26}, {0,3}, {6,10}, {19,20}, {0,0} };
 
-    interval_tree *tree = rb_new_tree(int_compare, int_print);
+    interval_tree *tree = rb_new_tree(int_compare, NULL, int_free, int_print);
 
     for (j=0; (intervals[j][0]+intervals[j][1] != 0); j++) {
-	interval *i = malloc(sizeof(*i));
-	i->low = &(intervals[j][0]);
-	i->high = &(intervals[j][1]);
+	int *low = malloc(sizeof(*low));
+	int *high = malloc(sizeof(*high));
+	*low = intervals[j][0];
+	*high = intervals[j][1];
 
-	interval_node *n = interval_new_node(i);
+	interval_node *n = interval_new_node(low, high);
 	rb_insert(tree, n);
     }
 
     /* unsuccessful search */
     int low=11, high=14;
-    interval i = {
-	.low = &low,
-	.high = &high,
-    };
 
-    interval_node *node = interval_search(tree, &i);
+    interval_node *node = interval_search(tree, &low, &high);
     assert(node == tree->nil);
 
     /* successful search */
     low=22;
     high=25;
-    node = interval_search(tree, &i);
+    node = interval_search(tree, &low, &high);
     assert( *(int*)node->low == 15);
     assert( *(int*)node->high == 23);
 
 
     /* deletion */
-    node = interval_delete(tree, node);
+    interval_delete(tree, node);
 
     low=25;
     high=30;
-    node = interval_search(tree, &i);
-    node = interval_delete(tree, node);
+    node = interval_search(tree, &low, &high);
+    interval_delete(tree, node);
     assert(*(int *)tree->root->max == 26);
 
     rb_print_tree(tree, RB_TREE_DOT);

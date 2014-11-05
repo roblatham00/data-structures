@@ -11,17 +11,13 @@
 #include "rbtree.h"
 
 
-typedef struct {
-    INTERVAL_TYPE *low;
-    INTERVAL_TYPE *high;
-} interval;
-
 typedef rb_node interval_node;
 typedef rb_tree interval_tree;
 
-interval_node *interval_new_node(interval *i);
+interval_node *interval_new_node(INTERVAL_TYPE *low, INTERVAL_TYPE *high);
 void interval_insert(interval_tree *T, interval_node *x);
-interval_node * interval_search(interval_tree *T, interval *i);
+interval_node * interval_search(interval_tree *T,
+	INTERVAL_TYPE *low, INTERVAL_TYPE *high);
 void interval_delete(interval_tree *T, interval_node *x);
 
 #endif
