@@ -19,7 +19,8 @@ void int_print(rb_node *n) {
 }
 
 void int_free(rb_node *a) {
-    free(a->key);
+    free(a->low);
+    free(a->high);
 }
 
 void test_tree1()
@@ -65,6 +66,7 @@ void test_tree1()
     assert(*(int *)tree->root->max == 26);
 
     rb_print_tree(tree, RB_TREE_DOT);
+    rb_delete_tree(tree);
 
 }
 
