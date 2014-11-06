@@ -17,6 +17,9 @@ rb_node nil = {
 
 };
 
+
+#define SWAP(x, y) do { void *T = x; x = y; y = T; } while (0);
+
 /* returns pointer to largest of three things */
 void * max3(rb_tree *T, void *a, void *b, void *c)
 {
@@ -451,15 +454,14 @@ void rb_delete(rb_tree *T, rb_node *z)
 	y->p->right = x;
 
     /* above algorithim may choose sucessor of z to splice out.  in such a
-     * case, copy y's key and additional data into z before returning y */
+     * case, copy y's key and additional data into z before reclaiming y */
     if (y!=z) {
 	/* needs to copy all the node information */
-	z->key = y->key;
-	z->value = y->value;
-	/* augmented members: here is where I need a copy function */
-	z->low = y->low;
-	z->high = y->high;
-	z->max = y->max;
+	SWAP(z->key, y->key);
+	SWAP(z->value, y->value);
+	SWAP(z->low, y->low);
+	SWAP(z->high, y->high);
+	SWAP(z->max, y->max);
 	z->size = y->size;
     }
 
@@ -493,7 +495,7 @@ rb_node * rb_new_node(RBTREE_TYPE *key)
     n->size = 0; /* will increment by one once inserted */
     /* interval list augment */
     n->low = key;
-    n->high = key;
+    n->high = key; /* for regular rb-tree, the intervals are just empty */
     n->max = key;
 
     return n;
