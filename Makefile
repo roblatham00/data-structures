@@ -5,6 +5,8 @@ TEST_CFLAGS=$(CFLAGS) -I$(PREFIX)/include
 TEST_LDFLAGS=-L$(PREFIX)/lib
 TEST_LDLIBS=-lrbtree
 
+VALGRIND=valgrind -q --leak-check=full --show-reachable=yes --error-exitcode=100 --log-file=valgrind-\%p.out
+
 rbtree.o: rbtree.c rbtree.h
 
 orderstat.o: orderstat.c orderstat.h rbtree.o
@@ -35,9 +37,9 @@ test-interval: test/test-interval.o librbtree.a
 	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) $(TEST_LDLIBS)
 
 test: test-rb test-os test-interval
-	./test-rb 100   | dot -Tpdf > test-rb.pdf
-	./test-os       | dot -Tpdf > test-os.pdf
-	./test-interval | dot -Tpdf > test-interval.pdf
+	$(VALGRIND) ./test-rb 100   | dot -Tpdf > test-rb.pdf
+	$(VALGRIND) ./test-os       | dot -Tpdf > test-os.pdf
+	$(VALGRIND) ./test-interval | dot -Tpdf > test-interval.pdf
 
 install: all
 	install -d $(PREFIX)/lib $(PREFIX)/include $(PREFIX)/doc
