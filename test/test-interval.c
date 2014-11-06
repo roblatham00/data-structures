@@ -56,12 +56,13 @@ void test_tree1()
     assert( *(int*)node->high == 23);
 
 
-    /* deletion */
+    /* deletion of leaf node */
     interval_delete(tree, node);
 
     low=25;
     high=30;
     node = interval_search(tree, &low, &high);
+    /* deletion of an internal node */
     interval_delete(tree, node);
     assert(*(int *)tree->root->max == 26);
 
