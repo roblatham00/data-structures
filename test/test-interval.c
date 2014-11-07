@@ -30,7 +30,7 @@ void test_tree1()
     int intervals[][2] = {{ 16,21}, {8,9}, {25,30}, {5,8}, {15,23},
 	{17,19}, {26,26}, {0,3}, {6,10}, {19,20}, {0,0} };
 
-    interval_tree *tree = rb_new_tree(int_compare, NULL, int_free, int_print);
+    interval_tree *tree = rb_new_tree(int_compare, int_free, int_print);
 
     for (j=0; (intervals[j][0]+intervals[j][1] != 0); j++) {
 	int *low = malloc(sizeof(*low));

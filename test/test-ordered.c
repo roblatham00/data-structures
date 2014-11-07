@@ -38,7 +38,7 @@ rb_node *mknode(int i)
 
 void test_tree()
 {
-    rb_tree *tree = rb_new_tree(int_compare, NULL, int_free, ordered_print);
+    rb_tree *tree = rb_new_tree(int_compare, int_free, ordered_print);
     rb_node *x;
     int i;
     /* copy tree from 14.1 in CLRS */

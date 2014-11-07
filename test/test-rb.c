@@ -39,7 +39,7 @@ rb_node *mknode(int i)
 void tree_test_random(int nr_nodes)
 {
     int i;
-    rb_tree * tree = rb_new_tree(int_compare, NULL, int_free, int_print);
+    rb_tree * tree = rb_new_tree(int_compare, int_free, int_print);
 
     for (i=0; i< nr_nodes ; i++) {
 	rb_insert(tree, mknode(random()) );
@@ -67,7 +67,7 @@ void tree_test_delete_random(int nr_nodes)
     int i;
     int *targets = malloc(sizeof(*targets)*nr_nodes);
     rb_node *d;
-    rb_tree * tree = rb_new_tree(int_compare, NULL, int_free, int_print);
+    rb_tree * tree = rb_new_tree(int_compare, int_free, int_print);
 
     for (i=0; i< nr_nodes ; i++) {
 	targets[i] = random();
@@ -90,7 +90,7 @@ void tree_test_delete_random(int nr_nodes)
 
 void tree_test_delete()
 {
-    rb_tree * tree = rb_new_tree(int_compare, NULL, int_free, int_print);
+    rb_tree * tree = rb_new_tree(int_compare, int_free, int_print);
     rb_insert(tree, mknode(3));
     rb_insert(tree, mknode(1));
     rb_insert(tree, mknode(5));
@@ -118,7 +118,7 @@ void tree_test_delete_with_sucessor()
     int i, key, nodes[] = {15, 9, 5, 16, 29, 3, 12, 20, 33, 21, 25,
 	10, 8, 11, 13, 14, 2, 35, 18, 23, 6, 7, 0};
 
-    rb_tree * tree = rb_new_tree(int_compare, NULL, int_free, int_print);
+    rb_tree * tree = rb_new_tree(int_compare, int_free, int_print);
     rb_node *d;
     for (i=0; nodes[i] != 0; i++) {
 	rb_insert(tree, mknode(nodes[i]) );

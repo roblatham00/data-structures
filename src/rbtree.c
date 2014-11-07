@@ -502,7 +502,6 @@ rb_node * rb_new_node(RBTREE_TYPE *key)
 }
 
 rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
-	void (*copy)(rb_node *a),
 	void (*free)(rb_node *a),
 	void (*print)(rb_node *a) )
 {
@@ -520,7 +519,6 @@ rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
     T->compare = compare;
     T->print = print;
     T->free = free;
-    T->copy = NULL;
 
     return T;
 }
