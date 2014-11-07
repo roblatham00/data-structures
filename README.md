@@ -4,6 +4,8 @@ Sometimes it's not clear what the reuse rules are for code we find on the
 internet.  I've implemented some C data structures and package them up for work.
 
 * rb\_tree: A classic red-black tree as described in "Introduction to Algorithims" by CLRS
+* ordered-statistics: An augmneted red-black tree implementing rank operations
+* interval-tree:  A further-augmneted red-black tree for closed intervals
 
 ## Building
 
@@ -36,9 +38,9 @@ Once you create a node, instert it into the tree.
 
     void rb_insert(rb_tree *t, rb_node *z);
 
-This routine deletes the node from the tree.  Caller then must free the memory associated with node
+This routine deletes the node from the tree and deallocates memory associtaed with it (through the deallocation function passed to tree creation).
 
-    rb_node *rb_delete(rb_tree *T, rb_node *z);
+    void rb_delete(rb_tree *T, rb_node *z);
 
 Print tree.  'format\_flags' can be ORed together to produce several kinds of output:
 
