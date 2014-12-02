@@ -7,16 +7,15 @@ TEST_LDLIBS=-lrbtree
 
 VALGRIND=valgrind -q --leak-check=full --show-reachable=yes --error-exitcode=100 --log-file=valgrind-\%p.out
 
-rbtree.o: rbtree.c rbtree.h
+all: librbtree.a
 
-orderstat.o: orderstat.c orderstat.h rbtree.o
+src/rbtree.o: src/rbtree.c src/rbtree.h
 
-interval_tree.o: interval_tree.c interval_tree.h rbtree.o
+src/orderstat.o: src/orderstat.c src/orderstat.h src/rbtree.o
+
+src/interval_tree.o: src/interval_tree.c src/interval_tree.h src/rbtree.o
 
 librbtree.a: librbtree.a(src/rbtree.o) librbtree.a(src/orderstat.o) librbtree.a(src/interval_tree.o)
-
-
-all: librbtree.a
 
 test/test-rb.o: test/test-rb.c
 	$(CC) $(TEST_CFLAGS) $< -c -o $@
