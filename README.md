@@ -7,6 +7,9 @@ internet.  I've implemented some C data structures and package them up for work.
 * ordered-statistics: An augmneted red-black tree implementing rank operations
 * interval-tree:  A further-augmneted red-black tree for closed intervals
 
+I've continued to build on this collection with "Compressed Arrays", which
+provide (as best one can in C) array-like access to compressed data
+
 ## Building
 
 Edit Makefile for your environment.  (TODO: set this up with configure and pkg-config)
@@ -67,6 +70,16 @@ has a one-element interval (e.g. [2-2]).
 
 Same trick.  We maintain enough additional information in the standard red
 black tree to also offer ordered-statistics methods
+
+### compressed array
+what if you wanted to store ten billion items in memory?  Traditionally, one
+would use an out-of-core approach, possibly with compression.  Maybe we can
+keep everything in-core if we compress it.
+
+#### related work
+- growable arrays
+- compressed datatypes (but not in the way that databases do it: we're
+  compressing the memory representation, not on-disk)
 
 ## Author
 
