@@ -35,7 +35,10 @@ comparray comparray_alloc()
 COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count)
 {
     int64_t i;
+
     comparray_internal *carray = internal_arrays[array];
+    if (carray == NULL) return NULL;
+
     COMPARRAY_TYPE *value, *t = malloc(count *sizeof(COMPARRAY_TYPE));
     value = carray->data;
     for (i=0; i< count; i++ ) {
@@ -48,7 +51,9 @@ COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count)
 int comparray_set_n(comparray array, int64_t index, int64_t count, COMPARRAY_TYPE *value) {
     int i;
     COMPARRAY_TYPE *t;
+
     comparray_internal *carray = internal_arrays[array];
+    if (carray == NULL) return COMPARRAY_INVALID;
 
     for(i=0; i< count; i++) {
 	t = carray->data;
