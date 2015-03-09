@@ -7,7 +7,7 @@ TEST_LDLIBS=-lrbtree
 
 VALGRIND=valgrind -q --leak-check=full --show-reachable=yes --error-exitcode=100 --log-file=valgrind-\%p.out
 
-all: librbtree.a
+all: librbtree.a libcomparray.a
 
 src/rbtree.o: src/rbtree.c src/rbtree.h
 
@@ -16,6 +16,10 @@ src/orderstat.o: src/orderstat.c src/orderstat.h src/rbtree.o
 src/interval_tree.o: src/interval_tree.c src/interval_tree.h src/rbtree.o
 
 librbtree.a: librbtree.a(src/rbtree.o) librbtree.a(src/orderstat.o) librbtree.a(src/interval_tree.o)
+
+src/comparray.o: src/comparray.h src/comparray.c
+
+libcomparray.a: libcomparray.a(src/comparray.o)
 
 test/test-rb.o: test/test-rb.c
 	$(CC) $(TEST_CFLAGS) $< -c -o $@
@@ -34,6 +38,9 @@ test-os: test/test-ordered.o librbtree.a
 
 test-interval: test/test-interval.o librbtree.a
 	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) $(TEST_LDLIBS)
+
+test-comparray: test/test-comparray.o libcomparray.a librbtree.a
+	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) $(TEST_LDLIBS) -lcomparray
 
 test: test-rb test-os test-interval
 	$(VALGRIND) ./test-rb 100   | dot -Tpdf > test-rb.pdf
@@ -54,4 +61,4 @@ coverage-report:
 	genhtml --legend --output-directory coverage coverage.info
 
 clean:
-	rm -f src/*.o *.a test/*.o test-os test-rb test-interval
+	rm -f src/*.o *.a test/*.o test-os test-rb test-interval test-comparray
