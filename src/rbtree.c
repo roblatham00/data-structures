@@ -4,6 +4,11 @@
 #define RBTREE_TYPE int
 #include "rbtree.h"
 
+enum reb_black_color {
+    RED,
+    BLACK,
+};
+
 rb_node nil = {
     .color = BLACK,
     .key = NULL,

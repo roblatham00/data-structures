@@ -8,11 +8,6 @@
 #define RBTREE_TYPE void
 #endif
 
-enum reb_black_color {
-    RED,
-    BLACK,
-};
-
 enum rb_tree_output_flags {
     RB_TREE_DEFAULT = 0x1,
     RB_TREE_DOT     = 0x2,
