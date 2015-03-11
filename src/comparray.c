@@ -15,7 +15,13 @@
 #define COMPARRAY_DEFAULT_CHUNK_SIZE 10
 
 typedef struct {
-    void *data;
+    void * data;
+    int64_t low;
+    int64_t high;
+} blockcache_t;
+	
+typedef struct {
+    blockcache_t blockcache;
     int64_t size;           /* questionable: total number of items stored */
     int64_t block_size;     /* size of each block (before compression) */
     int64_t index;          /* internal placholder 'cursor' for the streaming
@@ -117,6 +123,10 @@ int comparray_set_n(comparray array, int64_t index,
 
     comparray_internal *carray = internal_arrays[array];
     if (carray == NULL) return COMPARRAY_INVALID;
+
+    /* we cannot operate directly on compressed data: that's the whole point of
+     * this data structure.  instead, we operate on a cached block  */
+
 
     /* caller provides a list of values from array[index] to
      * array[index+count-1].  This list could be a full compressed block or
