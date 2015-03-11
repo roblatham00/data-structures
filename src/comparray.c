@@ -3,8 +3,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "comparray.h"
+#include "interval_tree.h"
+
+#include "blosc.h"
+
+#define ROUND_DOWN(x, y) ( ((x)/(y))*(y) )
+#define ROUND_UP(x, y)   ( ( ((x)+((y)-1)) / (y)) * (y))
+
+#define AS_INT64(p) (*((int64_t *)p))
 
 #define COMPARRAY_DEFAULT_CHUNK_SIZE 10
+
 typedef struct {
     void *data;
     int64_t size;           /* questionable: total number of items stored */
@@ -16,6 +25,52 @@ typedef struct {
 
 #define MAX_COMPARRAYS 25
 static comparray_internal * internal_arrays[MAX_COMPARRAYS];
+
+/* TODO: update these tree functions to operate on "compressed block", not int64 */
+int block_compare(void * a, void *b)
+{
+    return (*(int64_t*)a- *(int64_t*)b);
+}
+
+void block_free(rb_node *a)
+{
+    /* TODO: think about what's stored in this tree */
+    free(a->key);
+}
+
+void block_print(rb_node *a)
+{
+    printf("%ld", *(int64_t *)(a->key) );
+}
+
+/* simple abstraction layer for compression.  snappy, blosc, whatever, but
+ * presently only for blosc */
+void compress_init() {
+    blosc_init();
+}
+
+void compress_destroy() {
+    blosc_destroy();
+}
+int compress(const void *src, size_t src_length, void *dest, size_t dest_size)
+{
+    return (blosc_compress(9, 1, sizeof(int64_t),
+		src_length, src, dest, dest_size));
+}
+
+int decompress(const void *src, size_t src_length, void *dest, size_t dest_size)
+{
+    return (blosc_decompress(src, dest, dest_size));
+}
+
+void comparray_init()
+{
+    compress_init();
+}
+void comparray_finalize()
+{
+    compress_destroy();
+}
 
 comparray comparray_alloc()
 {

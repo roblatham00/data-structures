@@ -1,4 +1,5 @@
 CC=gcc
+CPPFLAGS=-I${HOME}/work/soft/blosc-master/include
 CFLAGS=-Wall -g
 
 TEST_CFLAGS=$(CFLAGS) -I$(PREFIX)/include
