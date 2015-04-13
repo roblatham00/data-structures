@@ -41,10 +41,10 @@ void block_free(rb_node *a)
     free(a->value);
 }
 
-void block_print(rb_node *a)
+void block_print(rb_node *n)
 {
-    /* make this look like interval print */
-    printf("%ld", *(int64_t *)(a->key) );
+    printf("%ld: [%ld-%ld] (%ld)", *(int64_t *)n->key,
+	    *((int64_t *)n->low), *((int64_t *)n->high), *((int64_t *)n->max));
 }
 
 void comparray_init()
@@ -67,8 +67,17 @@ comparray comparray_create(size_t chunk_size, size_t type_size)
     carray->typesize = type_size;
     /* tree is empty: no blocks held here */
     carray->blocks = rb_new_tree(block_compare, block_free, block_print);
+    carray->cache = malloc(sizeof(blockcache_item));
+    int64_t *low, *high;
 
+    /* inital state: a single cached block of zeros, but nothing in the backing
+     * tree */
     carray->cache->data = calloc(chunk_size, type_size);
+    low = malloc(sizeof(int64_t));
+    high = malloc(sizeof(int64_t));
+    *low = 0;
+    *high = chunk_size-1;
+    carray->cache->node = interval_new_node(low, high);
 
     int i;
     for (i=0; i< MAX_COMPARRAYS; i++ ) {
@@ -105,6 +114,7 @@ int comparray_set_n(comparray array, int64_t index,
     ret = blockcache_set(carray->cache, carray->blocks,
 	    index, count, value, carray->chunk_size, carray->typesize);
 
+    rb_print_tree(carray->blocks, RB_TREE_DOT);
     if (ret == 0) return COMPARRAY_OK;
     return ret;
 }
