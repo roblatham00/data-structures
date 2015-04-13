@@ -5,7 +5,7 @@
 #ifndef COMPARRAY_H
 #define COMPARRAY_H
 
-#define COMPARRAY_TYPE int
+#define COMPARRAY_TYPE int64_t
 
 #ifndef COMPARRAY_TYPE
 #define COMPARRAY_TYPE void
@@ -26,7 +26,15 @@ enum {
 
 typedef int comparray; /* there's nothing the caller can poke at */
 
-comparray comparray_alloc();
+/* initialize comparray library and any dependencies */
+void comparray_init();
+
+/* clean up */
+void comparray_finalize();
+
+/* create a comparray container that stores data of size 'type_size' in chunks
+ * consisting of a 'chunk_size' number of elements */
+comparray comparray_create(size_t chunk_size, size_t type_size);
 
 /* retreive the 'count' elements from compressed array 'array' at index 'index' */
 COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count);

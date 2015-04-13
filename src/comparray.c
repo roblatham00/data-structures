@@ -3,91 +3,72 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "comparray.h"
+#include "blockcache.h"
 #include "interval_tree.h"
 
-#include "blosc.h"
-
-#define ROUND_DOWN(x, y) ( ((x)/(y))*(y) )
-#define ROUND_UP(x, y)   ( ( ((x)+((y)-1)) / (y)) * (y))
+/* not entirely sure which level of abstraction layer this should go */
+#define DEFAULT_CHUNK_SIZE 10
 
 #define AS_INT64(p) (*((int64_t *)p))
 
-#define COMPARRAY_DEFAULT_CHUNK_SIZE 10
 
 typedef struct {
-    void * data;
-    int64_t low;
-    int64_t high;
-} blockcache_t;
-	
-typedef struct {
-    blockcache_t blockcache;
-    int64_t size;           /* questionable: total number of items stored */
-    int64_t block_size;     /* size of each block (before compression) */
+    int64_t last ;           /* end of array */
+    int64_t chunk_size;     /* size of each block (before compression) */
     int64_t index;          /* internal placholder 'cursor' for the streaming
 			       operations */
+    size_t typesize;        /* size of basic element stored in array */
+    blockcache_item *cache;
     interval_tree *blocks;
 } comparray_internal;
 
-#define MAX_COMPARRAYS 25
+#define MAX_COMPARRAYS 5
 static comparray_internal * internal_arrays[MAX_COMPARRAYS];
 
 /* TODO: update these tree functions to operate on "compressed block", not int64 */
-int block_compare(void * a, void *b)
+int block_compare(COMPARRAY_TYPE * a, COMPARRAY_TYPE *b)
 {
+    /* compare-by-subtraction might be too clever if numbers are so far apart as to overflow int.  some other approaches:
+     *  return (va > vb) - (va < vb);
+     *  return (va < vb? -1 : va > vb? 1 : 0)
+     * see http://stackoverflow.com/questions/6103636/c-qsort-not-working-correctly */
     return (*(int64_t*)a- *(int64_t*)b);
 }
 
 void block_free(rb_node *a)
 {
     /* TODO: think about what's stored in this tree */
-    free(a->key);
+    free(a->value);
 }
 
 void block_print(rb_node *a)
 {
+    /* make this look like interval print */
     printf("%ld", *(int64_t *)(a->key) );
-}
-
-/* simple abstraction layer for compression.  snappy, blosc, whatever, but
- * presently only for blosc */
-void compress_init() {
-    blosc_init();
-}
-
-void compress_destroy() {
-    blosc_destroy();
-}
-int compress(const void *src, size_t src_length, void *dest, size_t dest_size)
-{
-    return (blosc_compress(9, 1, sizeof(int64_t),
-		src_length, src, dest, dest_size));
-}
-
-int decompress(const void *src, size_t src_length, void *dest, size_t dest_size)
-{
-    return (blosc_decompress(src, dest, dest_size));
 }
 
 void comparray_init()
 {
-    compress_init();
+    blockcache_init();
 }
 void comparray_finalize()
 {
-    compress_destroy();
+    blockcache_finalize();
 }
 
-comparray comparray_alloc()
+comparray comparray_create(size_t chunk_size, size_t type_size)
 {
     comparray_internal *carray;
 
     carray = malloc(sizeof(comparray_internal));
-    carray->data = malloc(1024); /* not really sure yet how to handle this */
-    carray->size = 0;
-    carray->block_size = COMPARRAY_DEFAULT_CHUNK_SIZE;
     carray->index = 0;
+    carray->last = 0;
+    carray->chunk_size = chunk_size;
+    carray->typesize = type_size;
+    /* tree is empty: no blocks held here */
     carray->blocks = rb_new_tree(block_compare, block_free, block_print);
+
+    carray->cache->data = calloc(chunk_size, type_size);
 
     int i;
     for (i=0; i< MAX_COMPARRAYS; i++ ) {
@@ -99,54 +80,31 @@ comparray comparray_alloc()
 
 COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count)
 {
-    int64_t i;
+    char *value;
 
     comparray_internal *carray = internal_arrays[array];
     if (carray == NULL) return NULL;
 
-    COMPARRAY_TYPE *value, *t = malloc(count *sizeof(COMPARRAY_TYPE));
-    value = carray->data;
-    for (i=0; i< count; i++ ) {
-	t[i] = value[index+i];
-    }
+    value = malloc(count*carray->typesize);
+    blockcache_get(carray->cache, carray->blocks,
+	    index, count, (COMPARRAY_TYPE *)value,
+	    carray->chunk_size, carray->typesize);
 
-    return t;
+    return (COMPARRAY_TYPE *)value;
 }
 
 int comparray_set_n(comparray array, int64_t index,
 	int64_t count, COMPARRAY_TYPE *value)
 {
-    int i;
-    int64_t low, high, processed, block_off;
-    COMPARRAY_TYPE *t;
-    interval_node *n;
-
+    int ret;
     comparray_internal *carray = internal_arrays[array];
     if (carray == NULL) return COMPARRAY_INVALID;
 
     /* we cannot operate directly on compressed data: that's the whole point of
      * this data structure.  instead, we operate on a cached block  */
+    ret = blockcache_set(carray->cache, carray->blocks,
+	    index, count, value, carray->chunk_size, carray->typesize);
 
-
-    /* caller provides a list of values from array[index] to
-     * array[index+count-1].  This list could be a full compressed block or
-     * could overlap two blocks */
-    low = ROUND_DOWN(index, carray->block_size);
-    high = ROUND_UP(index+count, carray->block_size);
-
-    /* do we have a block already? if so, we need to update (some) of it */
-    n = interval_search(carray->blocks, &low, &high);
-    if (n != NULL) {
-	/* three cases: partial overlap with low, partial overlap with high,
-	 * full overlap */
-	block_off = AS_INT64(n->low);
-
-    }
-
-    /* if there is no block, create and insert one */
-    for(i=0; i< count; i++) {
-	t = carray->data;
-	t[index+i] = value[i];
-    }
-    return COMPARRAY_OK;
+    if (ret == 0) return COMPARRAY_OK;
+    return ret;
 }

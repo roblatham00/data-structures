@@ -1,14 +1,16 @@
-CC=gcc
-CPPFLAGS=-I${HOME}/work/soft/blosc-master/include
+BLOSC=$(HOME)/work/soft/blosc-master
+CC=clang
+CPPFLAGS=-I$(BLOSC)/include -Isrc
 CFLAGS=-Wall -g
 
+
 TEST_CFLAGS=$(CFLAGS) -I$(PREFIX)/include
-TEST_LDFLAGS=-L$(PREFIX)/lib
+TEST_LDFLAGS=-L$(PREFIX)/lib -L$(BLOSC)/lib
 TEST_LDLIBS=-lrbtree
 
 VALGRIND=valgrind -q --leak-check=full --show-reachable=yes --error-exitcode=100 --log-file=valgrind-\%p.out
 
-all: librbtree.a libcomparray.a libbtree.a
+all: librbtree.a libcomparray.a
 
 src/rbtree.o: src/rbtree.c src/rbtree.h
 
@@ -21,11 +23,9 @@ librbtree.a: librbtree.a(src/rbtree.o) librbtree.a(src/orderstat.o) librbtree.a(
 
 src/comparray.o: src/comparray.h src/comparray.c
 
-libcomparray.a: libcomparray.a(src/comparray.o)
+src/blockcache.o: src/blockcache.h src/blockcache.c
 
-src/btree.o: src/btree.c src/btree.h
-
-libbtree.a: libbtree.a(src/btree.o)
+libcomparray.a: libcomparray.a(src/comparray.o) libcomparray.a(src/blockcache.o)
 
 test/test-rb.o: test/test-rb.c
 	$(CC) $(TEST_CFLAGS) $< -c -o $@
@@ -46,7 +46,7 @@ test-interval: test/test-interval.o librbtree.a
 	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) $(TEST_LDLIBS)
 
 test-comparray: test/test-comparray.o libcomparray.a librbtree.a
-	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) $(TEST_LDLIBS) -lcomparray
+	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) -lcomparray -lblosc $(TEST_LDLIBS)
 
 test: test-rb test-os test-interval
 	$(VALGRIND) ./test-rb 100   | dot -Tpdf > test-rb.pdf
@@ -60,6 +60,8 @@ install: all
 	install -m 644 README.md $(PREFIX)/doc
 	install -m 644 src/orderstat.h $(PREFIX)/include
 	install -m 644 src/interval_tree.h $(PREFIX)/include
+	install -m 644 src/comparray.h $(PREFIX)/include
+	install -m 644 libcomparray.a $(PREFIX)/lib/
 
 # coverage requires lcov
 coverage-report:
