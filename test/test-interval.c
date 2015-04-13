@@ -71,9 +71,29 @@ void test_tree1()
 
 }
 
+/* the simple set of intervals from the compressed array client */
+void test_tree2()
+{
+    int j;
+    int intervals[][2] = {{0,9}, {10,19}, {20, 29}, {30, 39}, {40, 49},
+	{50, 59}, {60, 69}, {70, 79}, {80, 89}, {0,0} };
+    interval_tree *tree = rb_new_tree(int_compare, int_free, int_print);
+    for (j=0; (intervals[j][0]+intervals[j][1] != 0); j++) {
+	int *low = malloc(sizeof(*low));
+	int *high = malloc(sizeof(*high));
+	*low = intervals[j][0];
+	*high = intervals[j][1];
+
+	interval_node *n = interval_new_node(low, high);
+	rb_insert(tree, n);
+	assert(*(int *)tree->root->max = intervals[j][1]);
+    }
+}
+
 int main(int argc, char **argv)
 {
     test_tree1();
+    test_tree2();
     return 0;
 }
 
