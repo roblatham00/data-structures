@@ -6,7 +6,7 @@ void shuffle_int64t(int n, int64_t *array)
 {
     int i, j;
     srand(18);
-    for (i=(n-1); i> 0; i++) {
+    for (i=(n-1); i> 0; i--) {
 	int64_t t;
 	j = (rand() % i);
 	t = array[i];
