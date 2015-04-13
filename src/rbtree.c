@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#define RBTREE_TYPE int
 #include "rbtree.h"
 
 enum reb_black_color {
