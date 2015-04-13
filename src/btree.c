@@ -22,13 +22,10 @@ btree_node * get_node(btree_node *x) {
     return &(node_cache.node);
 }
 
-int set_node(btree_node *x)
+set_node(btree_node *x)
 {
     /* experiment with different shuffle values. must be in range of 1-255 */
-    /* stuck here: where does compressed/uncompressed data live? */
-    blosc_compress(9, 1, 32, sizeof(*x), x, NULL, 0);
-    return 0;
-}
+    blosc_compress(9, 1, 32, sizeof(*x), x, 
 
 btree_search_result *btree_search(btree *T, btree_node *x, BTREE_TYPE *k)
 {
@@ -49,9 +46,9 @@ btree_search_result *btree_search(btree *T, btree_node *x, BTREE_TYPE *k)
 
 void btree_create(btree *T)
 {
-    btree_node *x = malloc (sizeof(x));
+    btree_node x = malloc (sizeof(x));
     x->is_leaf = LEAF;
     x->n = 0;
-    btree_node *chunk = T->set_node(x);
+    chunk = T->set_node(x);
     T->root = x;
 }

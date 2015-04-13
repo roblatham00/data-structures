@@ -42,7 +42,7 @@ typedef struct {
  *   output: returns node 'y' and index 'i': such that y->keys[i] is k.
  *           NIL for no match */
 btree_search_result *btree_search(btree *T, btree_node *x, BTREE_TYPE *k);
-void btree_create(btree *T);
+void btree_create(btree T);
 void btree_insert();
 
 #endif
