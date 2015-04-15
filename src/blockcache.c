@@ -126,19 +126,6 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
     return 0;
 }
 
-/* given a user buffer 'data' of length 'size', and a cached block, fill 'er
- * up.  Returns the amount of data tranfered.  Will stop when reaching either
- * the end of the user buffer or the end of the cached block, whichever comes
- * first */
-size_t blockcache_fill(blockcache_item *cache, int64_t index, BLOCKCACHE_TYPE * data,
-	int64_t count, size_t typesize)
-{
-    size_t nr_items = count;
-    char *start;
-
-    start = *(int64_t*)cache->node->low;
-    start = data + start*typesize
-}
 /* blockcache_set: two cases.
  * - If block is in cache, update cached data with 'data'
  * - If block not in cache, fetch block
@@ -147,23 +134,34 @@ size_t blockcache_fill(blockcache_item *cache, int64_t index, BLOCKCACHE_TYPE * 
 int blockcache_set(blockcache_item *cache, interval_tree *blocks, int64_t index,
 	int64_t count, BLOCKCACHE_TYPE *data, int64_t blocksize, size_t typesize)
 {
-    size_t i;
-    int64_t num_moved=0;
+    size_t i, j;
+    int64_t cache_offset;
     int ret;
     char *src = (char*)data;
 
-    while (num_moved < count) {
-	if (!in_cache(cache->node, index+num_moved) ) {
+    /* consider a stream "1 2 3 4 5 6 7 8" and a two-item cache.
+     * - slot for '1' is not in cache
+     * - slots for the 0th and 1st item are loaded into cache
+     * - determine there are two slots cached
+     * - transfer to cache
+     * - 3 now is not in cache, so repeat the process */
+    for (i=0; i<count; i++) {
+	if (!in_cache(cache->node, index+i) ) {
 	    ret = blockcache_fetch(cache, blocks, index+i,
 		    blocksize, typesize, BLOCKCACHE_SET);
 	    if (ret != 0) return -1;
 	}
-	num_moved += blockcache_fill(cache, data);
-	/* TODO: optimize this by batching up requests.. "while in_cache..."
-	 * it also makes the memcpy math a lot easier */
-	memcpy((char *)(cache->data)+(i*typesize), src, typesize);
+	/* what if we have an array {1, 2, 3, 4, 5, 6} and want to set the 1st
+	 * element (2).  need to determine our offset into the cache */
+	cache_offset = (index+i)-*(int64_t*)(cache->node->low);
+	/* then determine the smaller of "how many slots are in the cache" or
+	 * "how many items are left to tranfer"  */
+	for(j=0; i+j < count && in_cache(cache->node, index+i+j); j++)
+	    ; /* no body: simply walking the cache block */
+	memcpy((char *)(cache->data)+(cache_offset*typesize), src, typesize*j);
 	cache->is_dirty=1;
-	src+=typesize;
+	src+=typesize*j;
+	i+=(j-1); /* minus one because cache-counting for loop increments one extra */
     }
     return 0;
 }
