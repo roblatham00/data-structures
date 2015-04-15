@@ -257,7 +257,8 @@ void print_helper(rb_tree *T, rb_node *x, int depth)
 
 void print_tree_dot(rb_tree *t)
 {
-    printf("digraph rb_tree {\n");
+    static int counter=0;
+    printf("digraph rb_tree_%d {\n", counter++);
     print_helper_dot(t, t->root);
     printf("    }\n");
 }
