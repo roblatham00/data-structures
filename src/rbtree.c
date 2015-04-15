@@ -74,8 +74,8 @@ static void left_rotate(rb_tree *T, rb_node *x)
     x->size = x->left->size + x->right->size + 1;
 
     /* augment: interval tree */
-    y->max = x->max;
     x->max = max3(T, x->high, x->left->max, x->right->max);
+    y->max = max3(T, y->high, y->left->max, y->right->max);
 }
 
 static void right_rotate(rb_tree *T, rb_node *y)
@@ -112,8 +112,8 @@ static void right_rotate(rb_tree *T, rb_node *y)
     y->size = y->left->size + y->right->size + 1;
 
     /* augment: interval tree */
-    x->max = y->max;
     y->max = max3(T, y->high, y->left->max, y->right->max);
+    x->max = max3(T, x->high, x->left->max, x->right->max);
 }
 
 /* restating what is in CLRS, a red-black tree has 5 properties:
