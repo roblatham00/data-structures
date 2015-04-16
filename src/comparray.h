@@ -44,7 +44,7 @@ COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count);
 int comparray_set_n(comparray array, int64_t index, int64_t count, COMPARRAY_TYPE *value);
 
 /* deallocate everything associated with 'id' */
-void comparray_free(comparray *id);
+void comparray_free(comparray id);
 
 /* need a 'set index' and 'next n' */
 

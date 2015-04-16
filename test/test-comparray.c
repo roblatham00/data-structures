@@ -59,8 +59,13 @@ int main(int argc, char **argv)
     compare_buf = comparray_get_n(carray_random, 0, NR_ITEMS);
 
     nr_errors += array_compare(NR_ITEMS, random_items, compare_buf, "random");
+    free(compare_buf);
+    free(sequential_items);
+    free(random_items);
 
     if (nr_errors == 0) printf(" No Errors\n");
+    comparray_free(carray);
+    comparray_free(carray_random);
 
     comparray_finalize();
     return nr_errors;

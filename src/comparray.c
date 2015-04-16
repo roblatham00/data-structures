@@ -39,6 +39,8 @@ void block_free(rb_node *a)
 {
     /* TODO: think about what's stored in this tree */
     free(a->value);
+    free(a->low);
+    free(a->high);
 }
 
 void block_print(rb_node *n)
@@ -85,6 +87,19 @@ comparray comparray_create(size_t chunk_size, size_t type_size)
     }
     internal_arrays[i] = carray;
     return i;
+}
+
+void comparray_free(comparray array)
+{
+    comparray_internal *carray = internal_arrays[array];
+    if (carray == NULL) return;
+
+    rb_delete(carray->blocks, carray->cache->node);
+    rb_delete_tree(carray->blocks);
+    free(carray->cache->data);
+    free(carray->cache);
+    free(carray);
+    internal_arrays[array] = NULL;
 }
 
 COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count)

@@ -171,4 +171,5 @@ int blockcache_set(blockcache_item *cache, interval_tree *blocks, int64_t index,
 
 void blockcache_finalize()
 {
+    blosc_destroy();
 }
