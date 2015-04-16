@@ -86,20 +86,20 @@ void test_tree1()
 void test_tree2()
 {
     int j;
-    int intervals[][2] = {{0,9}, {10,19}, {20, 29}, {30, 39}, {40, 49},
+    int64_t intervals[][2] = {{0,9}, {10,19}, {20, 29}, {30, 39}, {40, 49},
 	{50, 59}, {60, 69}, {70, 79}, {80, 89}, {0,0} };
 
-    interval_tree *tree = rb_new_tree(int_compare, int_free, int_print);
+    interval_tree *tree = rb_new_tree(int64_compare, int_free, int64_print);
     for (j=0; (intervals[j][0]+intervals[j][1] != 0); j++) {
-	int *low = malloc(sizeof(*low));
-	int *high = malloc(sizeof(*high));
+	int64_t *low = malloc(sizeof(*low));
+	int64_t *high = malloc(sizeof(*high));
 	*low = intervals[j][0];
 	*high = intervals[j][1];
 
 	interval_node *n = interval_new_node(low, high);
 	rb_insert(tree, n);
 	rb_print_tree(tree, RB_TREE_DOT);
-	assert(*(int *)tree->root->max == intervals[j][1]);
+	assert(*(int64_t  *)tree->root->max == intervals[j][1]);
     }
     rb_print_tree(tree, RB_TREE_DOT);
     rb_delete_tree(tree);

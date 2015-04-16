@@ -105,15 +105,19 @@ void comparray_free(comparray array)
 COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count)
 {
     char *value;
+    int ret;
 
     comparray_internal *carray = internal_arrays[array];
     if (carray == NULL) return NULL;
 
     value = malloc(count*carray->typesize);
-    blockcache_get(carray->cache, carray->blocks,
+    ret = blockcache_get(carray->cache, carray->blocks,
 	    index, count, (COMPARRAY_TYPE *)value,
 	    carray->chunk_size, carray->typesize);
-
+    if (ret != COMPARRAY_OK) {
+	free (value);
+	return NULL;
+    }
     return (COMPARRAY_TYPE *)value;
 }
 
@@ -131,4 +135,13 @@ int comparray_set_n(comparray array, int64_t index,
 
     if (ret == 0) return COMPARRAY_OK;
     return ret;
+}
+
+/* mostly for debugging */
+void comparray_display(comparray array)
+{
+    comparray_internal *carray = internal_arrays[array];
+    if (carray == NULL) return;
+
+    rb_print_tree(carray->blocks, RB_TREE_DOT);
 }

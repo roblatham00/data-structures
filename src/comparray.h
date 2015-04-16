@@ -52,4 +52,6 @@ COMPARRAY_TYPE * comparray_next_n(comparray array, int64_t count);
 
 int comparray_seek(comparray array, int64_t index, int whence);
 
+/* dump out the internal representation of the array */
+void comparray_display(comparray array);
 #endif

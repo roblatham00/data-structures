@@ -30,7 +30,8 @@ int array_compare(int count, int64_t * a, int64_t *b, char *desc)
 }
 int main(int argc, char **argv)
 {
-#define CHUNK_SIZE 10
+#define NR_ITEMS 10000000
+#define CHUNK_SIZE NR_ITEMS/100
     comparray_init();
     comparray carray = comparray_create(CHUNK_SIZE, sizeof(int64_t));
     comparray carray_random = comparray_create(CHUNK_SIZE, sizeof(int64_t));
@@ -39,7 +40,6 @@ int main(int argc, char **argv)
     int nr_errors=0;
     int64_t *compare_buf;
 
-#define NR_ITEMS 100
     sequential_items = malloc(NR_ITEMS*sizeof(int64_t));
     random_items = malloc(NR_ITEMS*sizeof(int64_t));
 
@@ -59,10 +59,19 @@ int main(int argc, char **argv)
     compare_buf = comparray_get_n(carray_random, 0, NR_ITEMS);
 
     nr_errors += array_compare(NR_ITEMS, random_items, compare_buf, "random");
+
+    /* should fail: accessing past end */
+    int64_t *bad;
+    bad = comparray_get_n(carray_random, NR_ITEMS, 1);
+    if (bad != NULL) {
+	fprintf(stderr, "retrieved item that should not exist\n");
+	nr_errors++;
+    }
     free(compare_buf);
     free(sequential_items);
     free(random_items);
 
+    comparray_display(carray_random);
     if (nr_errors == 0) printf(" No Errors\n");
     comparray_free(carray);
     comparray_free(carray_random);
