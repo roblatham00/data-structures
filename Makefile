@@ -1,7 +1,14 @@
 BLOSC=$(HOME)/work/soft/blosc-master
-CC=clang
+CC=gcc
 CPPFLAGS=-I$(BLOSC)/include -Isrc
 CFLAGS=-Wall -g
+# coverage
+#CC=gcc
+#CFLAGS=-Wall -g -pg -fprofile-arcs -ftest-coverage
+#LDFLAGS=--coverage -lgcov
+# profiling
+#CFLAGS=-Wall -g -O2 --profile
+#LDFLAGS=--profile
 
 
 TEST_CFLAGS=$(CFLAGS) -I$(PREFIX)/include
@@ -70,4 +77,4 @@ coverage-report:
 	genhtml --legend --output-directory coverage coverage.info
 
 clean:
-	rm -f src/*.o *.a test/*.o test-os test-rb test-interval test-comparray
+	rm -f src/*.o src/*.gcda src/*.gcno gmon.out *.a test/*.o test/*.gcda test/*.gcno test-os test-rb test-interval test-comparray
