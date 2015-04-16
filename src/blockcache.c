@@ -35,11 +35,9 @@ int blockcache_flush(blockcache_item *cache, interval_tree *T, size_t typesize)
     /* - look for block in tree
      * - if no matching interval, add this one
      * - if we get a matching interval, update the payload */
-    static int64_t max=-1;
     int64_t *low, *high;
     low = cache->node->low;
     high = cache->node->high;
-    if (*high > max) max = *high;
     int64_t blocksize = *high - *low +1;
     interval_node *x = interval_search(T, cache->node->low, cache->node->high);
     if (x == T->nil) {
@@ -58,7 +56,6 @@ int blockcache_flush(blockcache_item *cache, interval_tree *T, size_t typesize)
 	compressed_data = realloc(compressed_data, blosc_cbytes);
 	cache->node->value = compressed_data;
 	rb_insert(T, cache->node);
-	assert(*(int64_t*)T->root->max == max);
 	rb_print_tree(T, RB_TREE_DOT);
     }
     return 0;
@@ -110,8 +107,9 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
 	int64_t index, int64_t count, BLOCKCACHE_TYPE *data,
 	int64_t blocksize, size_t typesize)
 {
-    size_t i;
-    char *p = (char *)data;
+    size_t i, j;
+    int64_t cache_offset;
+    char *dest = (char *)data;
     for(i=0; i<count; i++) {
 	/* in write case, we always create new entries.  in the read case,
 	 * however, need to handle "does not exist"  */
@@ -119,9 +117,15 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
 	    if (blockcache_fetch(cache, blocks, index+i,
 			blocksize, typesize, BLOCKCACHE_GET) != 0) return -1;
 	}
-	/* XXX: optimize by coalescing multiple items */
-	memcpy(p, (char *)(cache->data)+(i*typesize), typesize);
-	p+=typesize;
+	/* see comments in blockcache_set for how we coalece and combine cache
+	 * and buffer */
+	cache_offset = (index+i)-*(int64_t*)(cache->node->low);
+	for(j=0; i+j < count && in_cache(cache->node, index+i+j); j++)
+	    ; /* no body: simply walking the cache block */
+	memcpy(dest, (char *)(cache->data)+(cache_offset*typesize), typesize*j);
+	cache->is_dirty=1;
+	dest+=typesize*j;
+	i+=(j-1); /* minus one because cache-counting for loop increments one extra */
     }
     return 0;
 }
