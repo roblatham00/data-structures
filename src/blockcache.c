@@ -56,7 +56,6 @@ int blockcache_flush(blockcache_item *cache, interval_tree *T, size_t typesize)
 	compressed_data = realloc(compressed_data, blosc_cbytes);
 	cache->node->value = compressed_data;
 	rb_insert(T, cache->node);
-	rb_print_tree(T, RB_TREE_DOT);
     }
     return 0;
 }

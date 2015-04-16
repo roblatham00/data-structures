@@ -114,7 +114,6 @@ int comparray_set_n(comparray array, int64_t index,
     ret = blockcache_set(carray->cache, carray->blocks,
 	    index, count, value, carray->chunk_size, carray->typesize);
 
-    rb_print_tree(carray->blocks, RB_TREE_DOT);
     if (ret == 0) return COMPARRAY_OK;
     return ret;
 }
