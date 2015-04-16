@@ -48,10 +48,11 @@ test-interval: test/test-interval.o librbtree.a
 test-comparray: test/test-comparray.o libcomparray.a librbtree.a
 	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) -lcomparray -lblosc $(TEST_LDLIBS)
 
-test: test-rb test-os test-interval
+test: test-rb test-os test-interval test-comparray
 	$(VALGRIND) ./test-rb 100   | dot -Tpdf > test-rb.pdf
 	$(VALGRIND) ./test-os       | dot -Tpdf > test-os.pdf
 	$(VALGRIND) ./test-interval | dot -Tpdf > test-interval.pdf
+	$(VALGRIND) ./test-comparray
 
 install: all
 	install -d $(PREFIX)/lib $(PREFIX)/include $(PREFIX)/doc
