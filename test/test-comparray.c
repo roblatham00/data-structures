@@ -30,7 +30,7 @@ int array_compare(int count, int64_t * a, int64_t *b, char *desc)
 }
 int main(int argc, char **argv)
 {
-#define NR_ITEMS 10000000
+#define NR_ITEMS 1000000
 #define CHUNK_SIZE NR_ITEMS/100
     comparray_init();
     comparray carray = comparray_create(CHUNK_SIZE, sizeof(int64_t));
@@ -49,12 +49,21 @@ int main(int argc, char **argv)
     }
     shuffle_int64t(NR_ITEMS, random_items);
 
+    /* entire array */
     comparray_set_n(carray, 0, NR_ITEMS, sequential_items);
     compare_buf = comparray_get_n(carray, 0, NR_ITEMS);
 
     nr_errors += array_compare(NR_ITEMS, sequential_items, compare_buf, "sequential");
-
     free(compare_buf);
+
+    /* what about a specific item? */
+    for (i=0; i< 10; i++) {
+	size_t index = (rand() % NR_ITEMS);
+	compare_buf = comparray_get_n(carray, index, 17);
+	nr_errors += array_compare(17, &(sequential_items[index]), compare_buf, "random item");
+	free (compare_buf);
+    }
+
     comparray_set_n(carray_random, 0, NR_ITEMS, random_items);
     compare_buf = comparray_get_n(carray_random, 0, NR_ITEMS);
 
@@ -67,6 +76,7 @@ int main(int argc, char **argv)
 	fprintf(stderr, "retrieved item that should not exist\n");
 	nr_errors++;
     }
+    free(bad);
     free(compare_buf);
     free(sequential_items);
     free(random_items);
