@@ -24,6 +24,12 @@ enum {
     COMPARRAY_END
 };
 
+struct comparray_stat {
+    size_t nbytes;  /* amount of data stored in this data structure */
+    size_t cbytes;  /* amount of compressed data stored */
+    size_t metabytes; /* a.k.a overhead */
+};
+
 typedef int comparray; /* there's nothing the caller can poke at */
 
 /* initialize comparray library and any dependencies */
@@ -54,4 +60,7 @@ int comparray_seek(comparray array, int64_t index, int whence);
 
 /* dump out the internal representation of the array */
 void comparray_display(comparray array);
+
+/* some rudimentary statistics about the data structure */
+int comparray_stat(comparray array, struct comparray_stat *cstats);
 #endif

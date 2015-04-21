@@ -173,3 +173,23 @@ void blockcache_finalize()
 {
     blosc_destroy();
 }
+
+/* inorder traversal, summing up our overhead */
+int blockcache_stat_helper(interval_tree *T, interval_node *x,
+	struct comparray_stat *cstats)
+{
+    size_t nbytes, cbytes, blocksize;
+    if (x == T->nil) return 0;
+    if (x->left != T->nil)
+	blockcache_stat_helper(T, x->left, cstats);
+
+    blosc_cbuffer_sizes(x->value, &nbytes, &cbytes, &blocksize);
+    cstats->nbytes += nbytes;
+    cstats->cbytes += cbytes;
+    cstats->metabytes += sizeof(*x);
+
+    if (x->right != T->nil)
+	blockcache_stat_helper(T, x->right, cstats);
+
+    return 0;
+}

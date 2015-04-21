@@ -11,6 +11,9 @@
 #define INTERVAL_TYPE BLOCKCACHE_TYPE
 #endif
 #include "interval_tree.h"
+
+#include "comparray.h"
+
 typedef enum blockcache_type_e {
     BLOCKCACHE_INT,
     BLOCKCACHE_DOUBLE,
@@ -38,4 +41,7 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
 	int64_t blocksize, size_t typesize);
 
 void blockcache_finalize();
+
+int blockcache_stat_helper(interval_tree *T, interval_node *x, struct
+	comparray_stat *cstats);
 #endif

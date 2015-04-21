@@ -145,3 +145,20 @@ void comparray_display(comparray array)
 
     rb_print_tree(carray->blocks, RB_TREE_DOT);
 }
+
+int comparray_stat(comparray array, struct comparray_stat *cstats)
+{
+    comparray_internal *carray = internal_arrays[array];
+    if (carray == NULL) return 0;
+
+    /* the bookeeping items in the block cache */
+    cstats->metabytes=sizeof(*carray) + sizeof(blockcache_item) +
+	(carray->chunk_size*carray->typesize) + sizeof(interval_node);
+    /* nothing compressed in the cache */
+    cstats->nbytes=0;
+    cstats->cbytes=0;
+    /* then inorder traverse the tree looking at the compressed items */
+    blockcache_stat_helper(carray->blocks, carray->blocks->root, cstats);
+    return 0;
+
+}

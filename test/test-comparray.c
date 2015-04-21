@@ -28,6 +28,21 @@ int array_compare(int count, int64_t * a, int64_t *b, char *desc)
     }
     return nr_errors;
 }
+
+int test_sizes(comparray array, size_t num_items, size_t typesize)
+{
+    int nr_errors = 0;
+    /* space efficiecy of representation */
+    struct comparray_stat cstats;
+    comparray_stat(array, &cstats);
+    if (cstats.nbytes != num_items * typesize) {
+	fprintf(stderr, "incorrect size\n");
+	nr_errors++;
+    }
+    return nr_errors;
+}
+
+
 int main(int argc, char **argv)
 {
 #define NR_ITEMS 1000000
@@ -69,6 +84,8 @@ int main(int argc, char **argv)
     compare_buf = comparray_get_n(carray_random, 0, NR_ITEMS);
 
     nr_errors += array_compare(NR_ITEMS, random_items, compare_buf, "random");
+
+    nr_errors += test_sizes(carray_random, NR_ITEMS, sizeof(int64_t));
 
     /* should fail: accessing past end */
     int64_t *bad;
