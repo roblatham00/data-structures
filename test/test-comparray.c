@@ -59,6 +59,7 @@ int main(int argc, char **argv)
     /* what about a specific item? */
     for (i=0; i< 10; i++) {
 	size_t index = (rand() % NR_ITEMS);
+	if (index + 17 >= NR_ITEMS) continue;
 	compare_buf = comparray_get_n(carray, index, 17);
 	nr_errors += array_compare(17, &(sequential_items[index]), compare_buf, "random item");
 	free (compare_buf);
