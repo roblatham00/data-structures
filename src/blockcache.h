@@ -42,6 +42,8 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
 
 void blockcache_finalize();
 
+int blockcache_flush(blockcache_item *cache, interval_tree *T, size_t typesize);
+
 int blockcache_stat_helper(interval_tree *T, interval_node *x, struct
 	comparray_stat *cstats);
 #endif
