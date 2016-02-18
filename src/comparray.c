@@ -151,6 +151,7 @@ int comparray_stat(comparray array, struct comparray_stat *cstats)
     comparray_internal *carray = internal_arrays[array];
     if (carray == NULL) return 0;
 
+    blockcache_flush(carray->cache, carray->blocks, carray->typesize);
     /* the bookeeping items in the block cache */
     cstats->metabytes=sizeof(*carray) + sizeof(blockcache_item) +
 	(carray->chunk_size*carray->typesize) + sizeof(interval_node);
