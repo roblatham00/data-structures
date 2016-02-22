@@ -25,14 +25,13 @@ typedef struct {
 #define MAX_COMPARRAYS 5
 static comparray_internal * internal_arrays[MAX_COMPARRAYS];
 
-/* TODO: update these tree functions to operate on "compressed block", not int64 */
-int block_compare(COMPARRAY_TYPE * a, COMPARRAY_TYPE *b)
+int block_compare(BLOCKCACHE_TYPE * a, BLOCKCACHE_TYPE *b)
 {
     /* compare-by-subtraction might be too clever if numbers are so far apart as to overflow int.  some other approaches:
      *  return (va > vb) - (va < vb);
      *  return (va < vb? -1 : va > vb? 1 : 0)
      * see http://stackoverflow.com/questions/6103636/c-qsort-not-working-correctly */
-    return (*(int64_t*)a- *(int64_t*)b);
+    return (*(blkcache_idx_t*)a- *(blkcache_idx_t *)b);
 }
 
 void block_free(rb_node *a)
@@ -70,13 +69,13 @@ comparray comparray_create(size_t chunk_size, size_t type_size)
     /* tree is empty: no blocks held here */
     carray->blocks = rb_new_tree(block_compare, block_free, block_print);
     carray->cache = malloc(sizeof(blockcache_item));
-    int64_t *low, *high;
+    blkcache_idx_t *low, *high;
 
     /* inital state: a single cached block of zeros, but nothing in the backing
      * tree */
     carray->cache->data = calloc(chunk_size, type_size);
-    low = malloc(sizeof(int64_t));
-    high = malloc(sizeof(int64_t));
+    low = malloc(sizeof(*low));
+    high = malloc(sizeof(*low));
     *low = 0;
     *high = chunk_size-1;
     carray->cache->node = interval_new_node(low, high);

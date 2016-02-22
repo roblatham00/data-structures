@@ -5,8 +5,7 @@
 #ifndef COMPARRAY_H
 #define COMPARRAY_H
 
-#define COMPARRAY_TYPE int64_t
-
+/* for debugging, one could set this to some explicit type */
 #ifndef COMPARRAY_TYPE
 #define COMPARRAY_TYPE void
 #endif

@@ -21,9 +21,10 @@ int blockcache_init()
 }
 
 
-int in_cache(interval_node *node, size_t i)
+int in_cache(interval_node *node, blkcache_idx_t i)
 {
-    if (i <= *(BLOCKCACHE_TYPE*)(node->high) && *(BLOCKCACHE_TYPE*)(node->low) <= i)
+    if (i <= *(blkcache_idx_t*)(node->high) &&
+	    *(blkcache_idx_t*)(node->low) <= i)
 	return 1;
     return 0;
 }
@@ -35,7 +36,7 @@ int blockcache_flush(blockcache_item *cache, interval_tree *T, size_t typesize)
     /* - look for block in tree
      * - if no matching interval, add this one
      * - if we get a matching interval, update the payload */
-    int64_t *low, *high;
+    blkcache_idx_t *low, *high;
     low = cache->node->low;
     high = cache->node->high;
     int64_t blocksize = *high - *low +1;
@@ -62,13 +63,14 @@ int blockcache_flush(blockcache_item *cache, interval_tree *T, size_t typesize)
 
 /* here my nice tidy abstraction layers break down, but we need some place to
  * tie the interval tree holding compressed data and this cache */
-int blockcache_fetch(blockcache_item *cache, interval_tree *T, int64_t index,
-	int64_t blocksize, size_t typesize, blockcache_fetch_op flags)
+int blockcache_fetch(blockcache_item *cache, interval_tree *T,
+	blkcache_idx_t index, int64_t blocksize,
+	size_t typesize, blockcache_fetch_op flags)
 {
     /* caller should only call this routine if a cache lookup has failed.  No
      * harm, aside from overhead, in calling it with a desired item already in
      * cache */
-    int64_t *low, *high;
+    blkcache_idx_t *low, *high;
     if (cache->is_dirty) {
 	blockcache_flush(cache, T, typesize);
     }
@@ -85,8 +87,8 @@ int blockcache_fetch(blockcache_item *cache, interval_tree *T, int64_t index,
 	if (flags & BLOCKCACHE_SET) {
 	    /* note: we only put new items into the underlying tree when we
 	     * flush the cache */
-	    low = malloc(sizeof(int64_t));
-	    high = malloc(sizeof(int64_t));
+	    low = malloc(sizeof(*low));
+	    high = malloc(sizeof(*high));
 	    *low = ROUND_DOWN(index, blocksize);
 	    *high = *low + blocksize -1;
 	    x = interval_new_node(low, high);
@@ -103,10 +105,10 @@ int blockcache_fetch(blockcache_item *cache, interval_tree *T, int64_t index,
  * 'index'.  Store these 'count' values (each with size 'typesize') in
  * user-provided buffer 'data' */
 int blockcache_get(blockcache_item *cache, interval_tree *blocks,
-	int64_t index, int64_t count, BLOCKCACHE_TYPE *data,
+	blkcache_idx_t index, int64_t count, BLOCKCACHE_TYPE *data,
 	int64_t blocksize, size_t typesize)
 {
-    size_t i, j;
+    blkcache_idx_t i, j;
     int64_t cache_offset;
     char *dest = (char *)data;
     for(i=0; i<count; i++) {
@@ -118,7 +120,7 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
 	}
 	/* see comments in blockcache_set for how we coalece and combine cache
 	 * and buffer */
-	cache_offset = (index+i)-*(int64_t*)(cache->node->low);
+	cache_offset = (index+i)-*(blkcache_idx_t*)(cache->node->low);
 	for(j=0; i+j < count && in_cache(cache->node, index+i+j); j++)
 	    ; /* no body: simply walking the cache block */
 	memcpy(dest, (char *)(cache->data)+(cache_offset*typesize), typesize*j);
@@ -134,10 +136,11 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
  * - If block not in cache, fetch block
  * -- but, if no block exists (we haven't written that value yet), we need to
  *    create a new block in lower level data structure */
-int blockcache_set(blockcache_item *cache, interval_tree *blocks, int64_t index,
-	int64_t count, BLOCKCACHE_TYPE *data, int64_t blocksize, size_t typesize)
+int blockcache_set(blockcache_item *cache, interval_tree *blocks,
+	blkcache_idx_t index, int64_t count, BLOCKCACHE_TYPE *data,
+	int64_t blocksize, size_t typesize)
 {
-    size_t i, j;
+    blkcache_idx_t i, j;
     int64_t cache_offset;
     int ret;
     char *src = (char*)data;
@@ -156,7 +159,7 @@ int blockcache_set(blockcache_item *cache, interval_tree *blocks, int64_t index,
 	}
 	/* what if we have an array {1, 2, 3, 4, 5, 6} and want to set the 1st
 	 * element (2).  need to determine our offset into the cache */
-	cache_offset = (index+i)-*(int64_t*)(cache->node->low);
+	cache_offset = (index+i)-*(blkcache_idx_t*)(cache->node->low);
 	/* then determine the smaller of "how many slots are in the cache" or
 	 * "how many items are left to tranfer"  */
 	for(j=0; i+j < count && in_cache(cache->node, index+i+j); j++)

@@ -1,8 +1,7 @@
 #ifndef BLOCKCACHE_H
 #define BLOCKCACHE_H
 
-#define BLOCKCACHE_TYPE int64_t
-
+/* for debugging, one could set this to a specific type */
 #ifndef BLOCKCACHE_TYPE
 #define BLOCKCACHE_TYPE void
 #endif
@@ -13,6 +12,12 @@
 #include "interval_tree.h"
 
 #include "comparray.h"
+
+/* there is a difference between the payload and the index: the payload should
+ * be 'void *' in the * common case, but might be set to something explicit in
+ * the debugging case.  the index will always be some (possibly large) integer:
+ * it not need to be some generic type */
+typedef int64_t blkcache_idx_t;
 
 typedef enum blockcache_type_e {
     BLOCKCACHE_INT,
@@ -33,11 +38,11 @@ int blockcache_init();
 
 /* given a buffer 'data' of 'count' items, store at 'index'  */
 int blockcache_set(blockcache_item *cache, interval_tree *T,
-	int64_t index, int64_t count, BLOCKCACHE_TYPE *data,
+	blkcache_idx_t index, int64_t count, BLOCKCACHE_TYPE *data,
 	int64_t blocksize, size_t typesize);
 /* retrieve 'count' items at 'index' from cache and store into 'data' */
 int blockcache_get(blockcache_item *cache, interval_tree *blocks,
-	int64_t index, int64_t  count, BLOCKCACHE_TYPE *data,
+	blkcache_idx_t index, int64_t count, BLOCKCACHE_TYPE *data,
 	int64_t blocksize, size_t typesize);
 
 void blockcache_finalize();
