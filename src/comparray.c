@@ -162,3 +162,7 @@ int comparray_stat(comparray array, struct comparray_stat *cstats)
     return 0;
 
 }
+void comparray_zap(void *p)
+{
+    free(p);
+}

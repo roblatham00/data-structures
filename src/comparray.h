@@ -62,4 +62,11 @@ void comparray_display(comparray array);
 
 /* some rudimentary statistics about the data structure */
 int comparray_stat(comparray array, struct comparray_stat *cstats);
+
+/* this is silly but MPICH style prohibits the use of malloc/free.
+ * comparray_get_n will allocate memory, so call comparray_zap to reclaim it
+ */
+void comparray_zap(void *p);
+
 #endif
+
