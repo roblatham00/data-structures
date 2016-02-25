@@ -1,7 +1,8 @@
 BLOSC=$(HOME)/work/soft/blosc-master
 CC=gcc
 CPPFLAGS=-I$(BLOSC)/include -Isrc
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -O2 -fPIC
+LDFLAGS=-fPIC
 # coverage
 #CC=gcc
 #CFLAGS=-Wall -g -pg -fprofile-arcs -ftest-coverage
