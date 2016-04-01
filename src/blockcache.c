@@ -21,7 +21,7 @@ int blockcache_init()
 }
 
 
-int in_cache(interval_node *node, blkcache_idx_t i)
+static inline int in_cache(interval_node *node, blkcache_idx_t i)
 {
     if (i <= *(blkcache_idx_t*)(node->high) &&
 	    *(blkcache_idx_t*)(node->low) <= i)
