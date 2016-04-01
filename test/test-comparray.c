@@ -54,6 +54,8 @@ int main(int argc, char **argv)
     int64_t i, *sequential_items, *random_items;
     int nr_errors=0;
     int64_t *compare_buf;
+#define FILL_ITEMS 128
+    int64_t fill_array[FILL_ITEMS];
 
     sequential_items = malloc(NR_ITEMS*sizeof(int64_t));
     random_items = malloc(NR_ITEMS*sizeof(int64_t));
@@ -94,6 +96,12 @@ int main(int argc, char **argv)
 	fprintf(stderr, "retrieved item that should not exist\n");
 	nr_errors++;
     }
+
+    /* provide array to comparray; it will fill it */
+    comparray_fill_n(carray, 100, FILL_ITEMS, fill_array);
+    nr_errors += array_compare(FILL_ITEMS, fill_array,
+	    sequential_items+100, "fill");
+
     free(bad);
     free(compare_buf);
     free(sequential_items);

@@ -120,6 +120,23 @@ COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count)
     return (COMPARRAY_TYPE *)value;
 }
 
+int comparray_fill_n(comparray array, int64_t index,
+	int64_t count, void *dest)
+{
+    int ret;
+    comparray_internal *carray = internal_arrays[array];
+    if (carray == NULL) return -1;
+
+    /* just like set_n, excpt we fill up the user-provided buffer instead of
+     * allocating our own.  Probably should have just done it this way in the
+     * first place */
+    ret = blockcache_get(carray->cache, carray->blocks,
+	    index, count, (COMPARRAY_TYPE *) dest,
+	    carray->chunk_size, carray->typesize);
+    return ret;
+}
+
+
 int comparray_set_n(comparray array, int64_t index,
 	int64_t count, COMPARRAY_TYPE *value)
 {

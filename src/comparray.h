@@ -48,6 +48,10 @@ COMPARRAY_TYPE * comparray_get_n(comparray array, int64_t index, int64_t count);
  * at index 'index' */
 int comparray_set_n(comparray array, int64_t index, int64_t count, COMPARRAY_TYPE *value);
 
+/* provide an array 'dest'  to comparray and have it fill it with 'count' items
+ * beginning from index 'index' */
+int comparray_fill_n(comparray array, int64_t index, int64_t count, COMPARRAY_TYPE *dest);
+
 /* deallocate everything associated with 'id' */
 void comparray_free(comparray id);
 
