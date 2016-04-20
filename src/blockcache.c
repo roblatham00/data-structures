@@ -7,6 +7,9 @@
 
 
 #define ROUND_DOWN(x, y) ( ((x)/(y))*(y) )
+#define MIN(x, y) ( (x) < (y) ? (x) : (y))
+#define BLOCK_LOW(x) (*(blkcache_idx_t*)((x)->low))
+#define BLOCK_HIGH(x) (*(blkcache_idx_t*)((x)->high))
 
 typedef enum {
     BLOCKCACHE_GET,
@@ -108,10 +111,10 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
 	blkcache_idx_t index, int64_t count, BLOCKCACHE_TYPE *data,
 	int64_t blocksize, size_t typesize)
 {
-    blkcache_idx_t i, j;
-    int64_t cache_offset;
+    blkcache_idx_t i;
+    int64_t cache_offset, cache_remain, xfer_cnt;
     char *dest = (char *)data;
-    for(i=0; i<count; i++) {
+    for(i=0; i<count; /* increment in loop */) {
 	/* in write case, we always create new entries.  in the read case,
 	 * however, need to handle "does not exist"  */
 	if (!in_cache(cache->node, index+i) ) {
@@ -120,13 +123,15 @@ int blockcache_get(blockcache_item *cache, interval_tree *blocks,
 	}
 	/* see comments in blockcache_set for how we coalece and combine cache
 	 * and buffer */
-	cache_offset = (index+i)-*(blkcache_idx_t*)(cache->node->low);
-	for(j=0; i+j < count && in_cache(cache->node, index+i+j); j++)
-	    ; /* no body: simply walking the cache block */
-	memcpy(dest, (char *)(cache->data)+(cache_offset*typesize), typesize*j);
+	cache_offset = (index+i)-BLOCK_LOW(cache->node);
+	cache_remain = BLOCK_HIGH(cache->node) - BLOCK_LOW(cache->node) +1 -
+	    cache_offset;
+	xfer_cnt = MIN(cache_remain, count-i);
+	memcpy(dest, (char *)(cache->data)+(cache_offset*typesize),
+			typesize*xfer_cnt);
 	cache->is_dirty=1;
-	dest+=typesize*j;
-	i+=(j-1); /* minus one because cache-counting for loop increments one extra */
+	dest+=typesize*xfer_cnt;
+	i+=xfer_cnt;
     }
     return 0;
 }
@@ -140,8 +145,8 @@ int blockcache_set(blockcache_item *cache, interval_tree *blocks,
 	blkcache_idx_t index, int64_t count, BLOCKCACHE_TYPE *data,
 	int64_t blocksize, size_t typesize)
 {
-    blkcache_idx_t i, j;
-    int64_t cache_offset;
+    blkcache_idx_t i;
+    int64_t cache_offset, cache_remain, xfer_cnt;
     int ret;
     char *src = (char*)data;
 
@@ -151,7 +156,7 @@ int blockcache_set(blockcache_item *cache, interval_tree *blocks,
      * - determine there are two slots cached
      * - transfer to cache
      * - 3 now is not in cache, so repeat the process */
-    for (i=0; i<count; i++) {
+    for (i=0; i<count; /* increment in loop */) {
 	if (!in_cache(cache->node, index+i) ) {
 	    ret = blockcache_fetch(cache, blocks, index+i,
 		    blocksize, typesize, BLOCKCACHE_SET);
@@ -159,15 +164,17 @@ int blockcache_set(blockcache_item *cache, interval_tree *blocks,
 	}
 	/* what if we have an array {1, 2, 3, 4, 5, 6} and want to set the 1st
 	 * element (2).  need to determine our offset into the cache */
-	cache_offset = (index+i)-*(blkcache_idx_t*)(cache->node->low);
+	cache_offset = (index+i)-BLOCK_LOW(cache->node);
+	cache_remain = BLOCK_HIGH(cache->node) - BLOCK_LOW(cache->node) +1 -
+	    cache_offset;
 	/* then determine the smaller of "how many slots are in the cache" or
 	 * "how many items are left to tranfer"  */
-	for(j=0; i+j < count && in_cache(cache->node, index+i+j); j++)
-	    ; /* no body: simply walking the cache block */
-	memcpy((char *)(cache->data)+(cache_offset*typesize), src, typesize*j);
+	xfer_cnt = MIN(cache_remain, count-i);
+	memcpy((char *)(cache->data)+(cache_offset*typesize), src,
+			typesize*xfer_cnt);
 	cache->is_dirty=1;
-	src+=typesize*j;
-	i+=(j-1); /* minus one because cache-counting for loop increments one extra */
+	src+=typesize*xfer_cnt;
+	i+=xfer_cnt;
     }
     return 0;
 }
