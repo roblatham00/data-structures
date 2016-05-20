@@ -158,6 +158,7 @@ void comparray_display(comparray array)
 {
     comparray_internal *carray = internal_arrays[array];
     if (carray == NULL) return;
+    blockcache_flush(carray->cache, carray->blocks, carray->typesize);
 
     rb_print_tree(carray->blocks, RB_TREE_DOT);
 }
