@@ -48,6 +48,16 @@ void block_print(rb_node *n)
 	    *((int64_t *)n->low), *((int64_t *)n->high), *((int64_t *)n->max));
 }
 
+/* a routine that looks good for papers and presentations, but omits some of
+ * the internal details */
+void block_print_paper(rb_node *n)
+{
+    printf("start: %ld\n"
+	    "end: %ld\n"
+	    "compressed[...]",
+	    *((int64_t *)n->low), *((int64_t *)n->high) );
+}
+
 void comparray_init()
 {
     blockcache_init();
