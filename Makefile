@@ -18,7 +18,7 @@ TEST_LDLIBS=-lrbtree
 
 VALGRIND=valgrind -q --leak-check=full --show-reachable=yes --error-exitcode=100 --log-file=valgrind-\%p.out
 
-all: librbtree.a libcomparray.a
+all: librbtree.a libcomparray.a libskiplist.a
 
 src/rbtree.o: src/rbtree.c src/rbtree.h
 
@@ -34,6 +34,10 @@ src/comparray.o: src/comparray.h src/comparray.c
 src/blockcache.o: src/blockcache.h src/blockcache.c
 
 libcomparray.a: libcomparray.a(src/comparray.o) libcomparray.a(src/blockcache.o)
+
+src/skiplist.o: src/skiplist.h
+
+libskiplist.a: libskiplist.a(src/skiplist.o)
 
 test/test-rb.o: test/test-rb.c
 	$(CC) $(TEST_CFLAGS) $< -c -o $@
@@ -55,6 +59,8 @@ test-interval: test/test-interval.o librbtree.a
 
 test-comparray: test/test-comparray.o libcomparray.a librbtree.a
 	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) -lcomparray -lblosc $(TEST_LDLIBS)
+
+test-skiplist: test/test-skiplist.o libskiplist.a
 
 test: test-rb test-os test-interval test-comparray
 	$(VALGRIND) ./test-rb 100   | dot -Tpdf > test-rb.pdf
