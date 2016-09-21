@@ -62,12 +62,14 @@ test-comparray: test/test-comparray.o libcomparray.a librbtree.a
 	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) -lcomparray -lblosc $(TEST_LDLIBS)
 
 test-skiplist: test/test-skiplist.o libskiplist.a
+	$(CC) $(LDFLAGS) $< -o $@ $(TEST_LDFLAGS) -lskiplist
 
-test: test-rb test-os test-interval test-comparray
+test: test-rb test-os test-interval test-comparray test-skiplist
 	$(VALGRIND) ./test-rb 100   | dot -Tpdf > test-rb.pdf
 	$(VALGRIND) ./test-os       | dot -Tpdf > test-os.pdf
 	$(VALGRIND) ./test-interval | dot -Tpdf > test-interval.pdf
 	$(VALGRIND) ./test-comparray
+	$(VALGRIND) ./test-skiplist
 
 install: all
 	install -d $(PREFIX)/lib $(PREFIX)/include $(PREFIX)/doc
@@ -78,6 +80,8 @@ install: all
 	install -m 644 src/interval_tree.h $(PREFIX)/include
 	install -m 644 src/comparray.h $(PREFIX)/include
 	install -m 644 libcomparray.a $(PREFIX)/lib/
+	install -m 644 libskiplist.a $(PREFIX)/lib/
+
 
 # coverage requires lcov
 coverage-report:
