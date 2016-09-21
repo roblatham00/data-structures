@@ -3,6 +3,7 @@ CC=gcc
 CPPFLAGS=-I$(BLOSC)/include -Isrc
 CFLAGS=-Wall -g -O2 -fPIC
 LDFLAGS=-fPIC
+ARFLAGS=Uvr
 # coverage
 #CC=gcc
 #CFLAGS=-Wall -g -pg -fprofile-arcs -ftest-coverage
