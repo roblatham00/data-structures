@@ -2,11 +2,15 @@
 #include <stdlib.h>
 #include "skiplist.h"
 
+int int_compare(SKIPLIST_TYPE *a, SKIPLIST_TYPE* b)
+{
+    return *(int *)a-*(int *)b;
+}
 int main(int argc, char **argv)
 {
     int i, *j, errs=0;
     /* does it catch fire */
-    skiplist *list = skiplist_new(4);
+    skiplist *list = skiplist_new(4, int_compare);
     i = 4;
     skiplist_insert(list, &i, NULL);
     skiplist_delete(list, &i);

@@ -65,16 +65,32 @@ skiplist_node * make_node(int level, SKIPLIST_TYPE *key, void *value)
     return dummy;
 }
 
+void free_node(skiplist_node *n)
+{
+    free(n->forward);
+    free(n);
+}
+
 /*
  * implementations of public functions
  */
-skiplist * skiplist_new(int max_level) {
+skiplist * skiplist_new(int num_levels,
+	int (*compare)(SKIPLIST_TYPE *a, SKIPLIST_TYPE *b) )
+{
 
+    int i;
     skiplist *list;
     list = malloc(sizeof(*list));
-    list->nil = &nil;
-    list->header = &nil;
-    list->level = 1;
+    list->level = 0;
+    list->max_level = num_levels; /* zero-indexed */
+    list->header = malloc(sizeof(skiplist_node*)*num_levels);
+    for (i=0; i<num_levels; i++)
+	list->header[i] = &NIL;
+    list->compare = compare;
+    list->nil = &NIL;
+    list->nil->forward = malloc(sizeof(skiplist_node *)*num_levels);
+    for (i=0; i<num_levels; i++)
+	list->nil->forward[i] = list->nil;
 
     return list;
 }
