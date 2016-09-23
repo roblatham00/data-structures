@@ -29,7 +29,7 @@ void * skiplist_search(skiplist *L, SKIPLIST_TYPE *k);
 void skiplist_insert(skiplist *l, SKIPLIST_TYPE *key, void *value);
 
 /* delete specified key */
-skiplist_delete(skiplist *l, skiplist_node *z);
+void skiplist_delete(skiplist *l, SKIPLIST_TYPE *key);
 
 skiplist_node * skiplist_min(skiplist *l);
 
