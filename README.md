@@ -8,7 +8,10 @@ internet.  I've implemented some C data structures and package them up for work.
 * interval-tree:  A further-augmneted red-black tree for closed intervals
 
 I've continued to build on this collection with "Compressed Arrays", which
-provide (as best one can in C) array-like access to compressed data
+provide (as best one can in C) array-like access to compressed data.  The compresed-arrays data structure makes uses of the interval-tree to maintain its blocks
+
+I also implemented skip-lists because they seemed like something I should learn
+about.
 
 ## Building
 
@@ -72,9 +75,15 @@ Same trick.  We maintain enough additional information in the standard red
 black tree to also offer ordered-statistics methods
 
 ### compressed array
+
 what if you wanted to store ten billion items in memory?  Traditionally, one
 would use an out-of-core approach, possibly with compression.  Maybe we can
 keep everything in-core if we compress it.
+
+### skiplists
+
+Just your run of the mill skiplist, as described in the Pugh paper.
+
 
 #### related work
 - growable arrays
