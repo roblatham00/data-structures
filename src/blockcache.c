@@ -1,7 +1,14 @@
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+
 #include <assert.h>
-#include "blosc.h"
+#ifdef HAVE_BLOSC_H
+#include <blosc.h>
+#endif
 #include "interval_tree.h"
 #include "blockcache.h"
 

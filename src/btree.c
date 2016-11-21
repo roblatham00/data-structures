@@ -1,5 +1,9 @@
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+#ifdef HAVE_BLOSC_H
 #include <blosc.h>
+#endif
 #include "btree.h"
 
 /* could extend this to maintain N nodes, but for now it's just one: makes
