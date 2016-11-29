@@ -133,11 +133,16 @@ void tree_test_delete_with_sucessor()
 
 int main(int argc, char **argv)
 {
-    tree_test_random(atoi(argv[1]));
+    int nodect;
+    if (argc > 1)
+	nodect = atoi(argv[1]);
+    else
+	nodect = 100;
+    tree_test_random(nodect);
 
     tree_test_delete();
 
-    tree_test_delete_random(atoi(argv[1]));
+    tree_test_delete_random(nodect);
 
     tree_test_delete_with_sucessor();
 
