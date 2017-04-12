@@ -241,7 +241,7 @@ static void print_helper_dot(rb_tree *T, rb_node *x)
     }
 }
 
-void print_helper(rb_tree *T, rb_node *x, int depth)
+static void print_helper(rb_tree *T, rb_node *x, int depth)
 {
     int i;
     if (x == T->nil) return;
@@ -257,7 +257,7 @@ void print_helper(rb_tree *T, rb_node *x, int depth)
     }
 }
 
-void print_tree_dot(rb_tree *t)
+static void print_tree_dot(rb_tree *t)
 {
     static int counter=0;
     printf("digraph rb_tree_%d {\n", counter++);
@@ -265,7 +265,7 @@ void print_tree_dot(rb_tree *t)
     printf("    }\n");
 }
 
-void print_tree(rb_tree *t)
+static void print_tree(rb_tree *t)
 {
     print_helper(t, t->root, 0);
 }
@@ -526,7 +526,7 @@ rb_tree * rb_new_tree(int (*compare)(RBTREE_TYPE *a, RBTREE_TYPE *b),
     return T;
 }
 
-void rb_tree_destroy_do(rb_tree *t, rb_node *x)
+static void rb_tree_destroy_do(rb_tree *t, rb_node *x)
 {
     if (x->left != t->nil)
 	rb_tree_destroy_do(t, x->left);
