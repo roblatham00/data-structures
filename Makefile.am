@@ -35,12 +35,21 @@ libskiplist_la_SOURCES = src/skiplist.c
 
 include_HEADERS += src/skiplist.h
 
+#
+# simple tree
+#
+lib_LTLIBRARIES += libtree.la
+libtree_la_SOURCES = src/tree.c
+
+include_HEADERS += src/tree.h
+
 # testing
 check_PROGRAMS = test/test-comparray \
 		 test/test-interval \
 		 test/test-ordered \
 		 test/test-rb \
-		 test/test-skiplist
+		 test/test-skiplist \
+		 test/test-euler-29
 
 
 check_CPPFLAGS = -I$(srcdir)/src
@@ -49,7 +58,8 @@ TESTS = test/test-comparray \
 	test/test-interval \
 	test/test-ordered \
 	test/test-rb \
-	test/test-skiplist
+	test/test-skiplist \
+	test/test-euler-29
 
 test_test_comparray_CPPFLAGS = -I${srcdir}/src
 test_test_comparray_LDADD =  -lcomparray -lrbtree -lblosc
@@ -65,6 +75,9 @@ test_test_rb_LDADD = -lrbtree
 
 test_test_skiplist_CPPFLAGS = -I${srcdir}/src
 test_test_skiplist_LDADD = -lskiplist
+
+test_test_euler_29_CPPFLAGS = -I${srcdir}/src
+test_test_euler_29_LDADD = -ltree -lm
 
 
 # documentation products

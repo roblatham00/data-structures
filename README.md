@@ -13,6 +13,9 @@ provide (as best one can in C) array-like access to compressed data.  The compre
 I also implemented skip-lists because they seemed like something I should learn
 about.
 
+There is a simple binary search tree in here too because I was curious about
+how imbalanced a tree without rebalancing would get for a particular workload.
+
 ## Building
 
 Edit Makefile for your environment.  (TODO: set this up with configure and pkg-config)
@@ -84,6 +87,9 @@ keep everything in-core if we compress it.
 
 Just your run of the mill skiplist, as described in the Pugh paper.
 
+### tree
+
+Simple binary search tree as described in CLR
 
 #### related work
 - growable arrays
