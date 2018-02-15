@@ -83,6 +83,12 @@ what if you wanted to store ten billion items in memory?  Traditionally, one
 would use an out-of-core approach, possibly with compression.  Maybe we can
 keep everything in-core if we compress it.
 
+I wrote about using this data structure in the ROMIO MPI-IO implementation and
+presented the work at
+[PDSW-DISC 2016](http://www.pdsw.org/pdsw-discs16/index.shtml).  Read the
+[paper](http://www.pdsw.org/pdsw-discs16/papers/p37-latham.pdf) or view the
+[slides](http://www.pdsw.org/pdsw-discs16/slides/Latham-PDSW-DISCS-2016.pdf)
+
 ### skiplists
 
 Just your run of the mill skiplist, as described in the Pugh paper.
