@@ -18,11 +18,10 @@ how imbalanced a tree without rebalancing would get for a particular workload.
 
 ## Building
 
-Edit Makefile for your environment.  (TODO: set this up with configure and pkg-config)
-
-    $ make
-    $ make PREFIX=/path/for/installation install
-    $ make PREFIX=/path/for/installation test
+    $ autoreconf -fi
+    $ ./configure --prefix=/path/for/installation
+    $ make all install
+    $ make check
 
 ## API
 
