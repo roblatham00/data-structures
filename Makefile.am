@@ -1,4 +1,5 @@
 ACLOCAL_AMFLAGS="-Im4"
+AM_CPPFLAGS = -I${srcdir}/src
 
 #
 # several kinds of red-black tree data structures
@@ -15,6 +16,7 @@ include_HEADERS = src/rbtree.h \
 #
 # compressed array.
 #
+if COMPARRAY
 lib_LTLIBRARIES += libcomparray.la
 libcomparray_la_SOURCES = src/blockcache.c\
 			  src/comparray.c
@@ -26,6 +28,7 @@ noinst_HEADERS = src/blockcache.h \
 		 src/interval_tree.h \
 		 src/orderstat.h \
 		 src/rbtree.h
+endif
 
 #
 # skiplists
@@ -43,42 +46,57 @@ libtree_la_SOURCES = src/tree.c
 
 include_HEADERS += src/tree.h
 
+#
+# heap, heapsort, priority queue
+#
+lib_LTLIBRARIES += libheap.la
+libheap_la_SOURCES = src/heap.c
+
+include_HEADERS += src/heap.h\
+		   src/heap-c.h
+
 # testing
-check_PROGRAMS = test/test-comparray \
-		 test/test-interval \
+check_PROGRAMS = test/test-interval \
 		 test/test-ordered \
 		 test/test-rb \
 		 test/test-skiplist \
-		 test/test-euler-29
+		 test/test-euler-29 \
+		 test/test_heap \
+		 test/test_heap-c
+if COMPARRAY
+check_PROGRAMS += test/test-comparray
+endif
 
 
 check_CPPFLAGS = -I$(srcdir)/src
 
-TESTS = test/test-comparray \
-	test/test-interval \
+TESTS = test/test-interval \
 	test/test-ordered \
 	test/test-rb \
 	test/test-skiplist \
-	test/test-euler-29
+	test/test-euler-29 \
+	test/test_heap \
+	test/test_heap-c
 
-test_test_comparray_CPPFLAGS = -I${srcdir}/src
+if COMPARRAY
+TESTS += test/test-comparray
+
 test_test_comparray_LDADD =  -lcomparray -lrbtree -lblosc
+endif
 
-test_test_interval_CPPFLAGS = -I${srcdir}/src
 test_test_interval_LDADD = -lrbtree
 
-test_test_ordered_CPPFLAGS = -I${srcdir}/src
 test_test_ordered_LDADD = -lrbtree
 
-test_test_rb_CPPFLAGS = -I${srcdir}/src
 test_test_rb_LDADD = -lrbtree
 
-test_test_skiplist_CPPFLAGS = -I${srcdir}/src
 test_test_skiplist_LDADD = -lskiplist
 
-test_test_euler_29_CPPFLAGS = -I${srcdir}/src
 test_test_euler_29_LDADD = -ltree -lm
 
+test_test_heap_c_LDADD = -lheap
+
+test_test_heap_SOURCES = test/test_heap.cc
 
 # documentation products
 dist_doc_DATA = README.md

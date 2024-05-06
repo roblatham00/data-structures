@@ -10,11 +10,10 @@ internet.  I've implemented some C data structures and package them up for work.
 I've continued to build on this collection with "Compressed Arrays", which
 provide (as best one can in C) array-like access to compressed data.  The compresed-arrays data structure makes uses of the interval-tree to maintain its blocks
 
-I also implemented skip-lists because they seemed like something I should learn
-about.
-
-There is a simple binary search tree in here too because I was curious about
-how imbalanced a tree without rebalancing would get for a particular workload.
+I'll also from time to time implement other data structures when I need to do a bit of hands-on learning:
+* skip-lists (not quite right yet)
+* a simple binary search tree
+* heap and heapsort
 
 ## Building
 
@@ -95,6 +94,10 @@ Just your run of the mill skiplist, as described in the Pugh paper.
 ### tree
 
 Simple binary search tree as described in CLR
+
+### heap
+
+The CLR heap, heapsort, and priority queue algorithm
 
 #### related work
 - growable arrays

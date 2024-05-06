@@ -14,17 +14,21 @@ LT_INIT([dlopen])
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_INSTALL
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lblosc':
+
 AC_CHECK_LIB([blosc], [blosc_init])
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h stdint.h stdlib.h string.h unistd.h])
 AC_CHECK_HEADER([blosc.h],
 		AC_DEFINE(HAVE_BLOSC_H),
-		AC_MSG_ERROR([unable to find blosc header])
+		AC_MSG_WARN([unable to find blosc header])
 )
+
+AM_CONDITIONAL([COMPARRAY], [test "x$ac_cv_header_blosc_h" = xyes ])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
